@@ -7,7 +7,7 @@ class MemberSignup {
         this.organizationSlug = 'no-id-lab';
         
         // Configuration Sandbox/Production
-        this.isTestMode = true; // 🧪 METTRE À FALSE EN PRODUCTION
+        this.isTestMode = false; // 🧪 METTRE À FALSE EN PRODUCTION
         this.baseUrl = this.isTestMode 
             ? 'https://api.helloasso-sandbox.com/v5' 
             : 'https://api.helloasso.com/v5';
@@ -525,11 +525,11 @@ class MemberSignup {
         if (this.isTestMode) {
             const indicator = document.createElement('div');
             indicator.style.cssText = `
-                position: fixed;
+            position: fixed;
                 top: 10px;
                 right: 10px;
                 background: linear-gradient(135deg, #ff6b35, #f7931e);
-                color: white;
+            color: white;
                 padding: 8px 16px;
                 border-radius: 20px;
                 font-size: 12px;
