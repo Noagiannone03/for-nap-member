@@ -5,8 +5,18 @@ class MemberSignup {
         this.helloAssoClientId = 'b113d06d07884da39d0a6b52482b40bd';
         this.helloAssoClientSecret = 'NMFwtSG1Bt63HkJ2Xn/vqarfTbUJBWsP';
         this.organizationSlug = 'no-id-lab';
-        this.baseUrl = 'https://api.helloasso.com/v5';
-        this.oauthUrl = 'https://api.helloasso.com/oauth2';
+        
+        // Configuration Sandbox/Production
+        this.isTestMode = true; // 🧪 METTRE À FALSE EN PRODUCTION
+        this.baseUrl = this.isTestMode 
+            ? 'https://api.helloasso-sandbox.com/v5' 
+            : 'https://api.helloasso.com/v5';
+        this.oauthUrl = this.isTestMode 
+            ? 'https://api.helloasso-sandbox.com/oauth2' 
+            : 'https://api.helloasso.com/oauth2';
+        
+        // Montant de l'adhésion (en centimes)
+        this.membershipPrice = this.isTestMode ? 100 : 1200; // 1€ en test, 12€ en prod
         
         // URL de retour pour les tests locaux (à changer en production)
         this.testReturnUrl = 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
@@ -17,6 +27,7 @@ class MemberSignup {
     init() {
         this.setupEventListeners();
         this.handleUrlParams(); // Pour gérer les retours de paiement
+        this.showTestModeIndicator(); // Affichage du mode test
     }
 
     setupEventListeners() {
@@ -196,7 +207,7 @@ class MemberSignup {
             zipcode: document.getElementById('member-zipcode').value,
             email: document.getElementById('member-email').value,
             phone: document.getElementById('member-phone').value,
-            amount: 1200, // 12€ en centimes
+            amount: this.membershipPrice, // Prix dynamique selon le mode
             timestamp: new Date().toISOString()
         };
 
@@ -219,7 +230,7 @@ class MemberSignup {
 
             // Sauvegarder les données temporairement
             this.currentFormData = formData;
-
+            
             // Initier le paiement HelloAsso
             await this.initializeHelloAssoPayment(formData);
 
@@ -371,8 +382,8 @@ class MemberSignup {
                     <div class="loading-spinner"></div>
                     <h3>Préparation du paiement...</h3>
                     <p>Vous allez être redirigé vers HelloAsso pour finaliser votre adhésion.</p>
-                </div>
-            `;
+            </div>
+        `;
             document.querySelector('.content-wrapper').appendChild(loadingElement);
         }
         
@@ -428,7 +439,7 @@ class MemberSignup {
             setTimeout(() => {
                 document.getElementById('success-member').classList.remove('hidden');
             }, 300);
-            
+
         } catch (error) {
             console.error('Erreur lors de la sauvegarde après paiement:', error);
             // Même en cas d'erreur de sauvegarde, afficher le succès car le paiement a été effectué
@@ -446,7 +457,7 @@ class MemberSignup {
         
         // Revenir au formulaire member
         if (this.currentMode === 'member') {
-            setTimeout(() => {
+        setTimeout(() => {
                 this.showForm('member');
             }, 2000);
         }
@@ -508,6 +519,59 @@ class MemberSignup {
     validateZipCode(zipcode) {
         const zipcodeRegex = /^[0-9]{5}$/;
         return zipcodeRegex.test(zipcode);
+    }
+
+    showTestModeIndicator() {
+        if (this.isTestMode) {
+            const indicator = document.createElement('div');
+            indicator.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: linear-gradient(135deg, #ff6b35, #f7931e);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: bold;
+                z-index: 9999;
+                box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+                animation: pulse 2s infinite;
+            `;
+            indicator.innerHTML = `🧪 MODE TEST - ${this.membershipPrice/100}€`;
+            document.body.appendChild(indicator);
+            
+            // Animation CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Mettre à jour les prix affichés dans l'interface
+            this.updatePriceDisplay();
+            
+            console.log('🧪 MODE TEST ACTIVÉ - Paiements sur HelloAsso Sandbox');
+            console.log(`💰 Prix test: ${this.membershipPrice/100}€ (au lieu de 12€)`);
+        }
+    }
+
+    updatePriceDisplay() {
+        const priceElements = document.querySelectorAll('.price-amount, .price');
+        priceElements.forEach(element => {
+            if (element.textContent.includes('12€') || element.textContent.includes('12')) {
+                element.textContent = `${this.membershipPrice/100}€`;
+                if (this.isTestMode) {
+                    element.style.backgroundColor = '#ff6b35';
+                    element.style.padding = '2px 6px';
+                    element.style.borderRadius = '4px';
+                    element.style.fontSize = '0.9em';
+                }
+            }
+        });
     }
 
     showError(message) {

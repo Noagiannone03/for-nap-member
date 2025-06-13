@@ -98,7 +98,7 @@ Content-Type: application/json
         "membershipType": "early-member",
         "age": "25",
         "phone": "+33123456789"
-    }
+  }
 }
 ```
 
