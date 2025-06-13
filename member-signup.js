@@ -5,12 +5,12 @@ class MemberSignup {
         this.currentMemberId = null;
         this.memberData = null;
         
-        // Configuration Sandbox HelloAsso
-        this.helloAssoClientId = '28eba7759dce4f0aaeb80b1e7e264f72';
-        this.helloAssoClientSecret = 'qWWRz7Dcbsi1nMxzCL8jHpRSlEXrvu0g';
+        // Configuration Production HelloAsso
+        this.helloAssoClientId = 'b113d06d07884da39d0a6b52482b40bd';
+        this.helloAssoClientSecret = 'NMFwtSG1Bt63HkJ2Xn/vqarfTbUJBWsP';
         this.organizationSlug = 'no-id-lab';
-        this.baseUrl = 'https://api.helloasso-sandbox.com/v5';
-        this.oauthUrl = 'https://api.helloasso-sandbox.com/oauth2';
+        this.baseUrl = 'https://api.helloasso.com/v5';
+        this.oauthUrl = 'https://api.helloasso.com/oauth2';
         
         // URL de retour pour les tests locaux (à changer en production)
         this.testReturnUrl = 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
@@ -441,7 +441,7 @@ class MemberSignup {
             setTimeout(() => {
                 document.getElementById('success-member').classList.remove('hidden');
             }, 300);
-            
+
         } catch (error) {
             console.error('Erreur lors de la sauvegarde après paiement:', error);
             // Même en cas d'erreur de sauvegarde, afficher le succès car le paiement a été effectué
