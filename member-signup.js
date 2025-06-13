@@ -2,11 +2,15 @@ class MemberSignup {
     constructor() {
         this.currentMode = null;
         this.currentFormData = null;
-        this.helloAssoClientId = 'b113d06d07884da39d0a6b52482b40bd';
-        this.helloAssoClientSecret = 'NMFwtSG1Bt63HkJ2Xn/vqarfTbUJBWsP';
+        this.currentMemberId = null;
+        this.memberData = null;
+        
+        // Configuration Sandbox HelloAsso
+        this.helloAssoClientId = '28eba7759dce4f0aaeb80b1e7e264f72';
+        this.helloAssoClientSecret = 'qWWRz7Dcbsi1nMxzCL8jHpRSlEXrvu0g';
         this.organizationSlug = 'no-id-lab';
-        this.baseUrl = 'https://api.helloasso.com/v5';
-        this.oauthUrl = 'https://api.helloasso.com/oauth2';
+        this.baseUrl = 'https://api.helloasso-sandbox.com/v5';
+        this.oauthUrl = 'https://api.helloasso-sandbox.com/oauth2';
         
         // URL de retour pour les tests locaux (à changer en production)
         this.testReturnUrl = 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
@@ -196,7 +200,7 @@ class MemberSignup {
             zipcode: document.getElementById('member-zipcode').value,
             email: document.getElementById('member-email').value,
             phone: document.getElementById('member-phone').value,
-            amount: 1200, // 12€ en centimes
+            amount: 10, // 10 centimes pour test
             timestamp: new Date().toISOString()
         };
 
@@ -411,7 +415,7 @@ class MemberSignup {
         }
     }
 
-    async handlePaymentSuccess(sessionId) {
+        async handlePaymentSuccess(sessionId) {
         console.log('Paiement réussi, session:', sessionId);
         
         try {
@@ -419,16 +423,25 @@ class MemberSignup {
             if (this.currentFormData) {
                 this.currentFormData.paymentStatus = 'completed';
                 this.currentFormData.sessionId = sessionId;
-                await this.saveToFirebase('members', this.currentFormData);
+                
+                // Sauvegarder en Firebase et récupérer l'ID
+                const memberId = await this.saveToFirebase('members', this.currentFormData);
+                this.currentMemberId = memberId;
+                
+                // Sauvegarder une copie des données pour le PDF
+                this.memberData = { ...this.currentFormData };
+                
+                // Générer et afficher le QR code
+                await this.generateMemberQRCode(memberId);
                 this.currentFormData = null;
             }
             
-            // Afficher le succès
+            // Afficher le succès avec QR code
             this.hideAllForms();
             setTimeout(() => {
                 document.getElementById('success-member').classList.remove('hidden');
             }, 300);
-
+            
         } catch (error) {
             console.error('Erreur lors de la sauvegarde après paiement:', error);
             // Même en cas d'erreur de sauvegarde, afficher le succès car le paiement a été effectué
@@ -527,6 +540,152 @@ class MemberSignup {
             errorElement.style.display = 'none';
         }, 5000);
     }
+
+    async generateMemberQRCode(memberId) {
+        try {
+            // Créer le QR code avec l'ID du membre
+            const qrContainer = document.getElementById('qr-code-container');
+            if (qrContainer) {
+                qrContainer.innerHTML = '<div class="qr-loading">Génération du QR code...</div>';
+                
+                // Générer le QR code
+                const qr = qrcode(0, 'M');
+                qr.addData(memberId);
+                qr.make();
+                
+                // Créer l'image du QR code
+                const qrImage = qr.createImgTag(4);
+                qrContainer.innerHTML = qrImage;
+                qrContainer.classList.add('loaded');
+                
+                // Mettre à jour l'ID membre affiché
+                const memberIdElement = document.getElementById('member-id-display');
+                if (memberIdElement) {
+                    memberIdElement.textContent = memberId;
+                }
+                
+                console.log('QR Code généré pour le membre:', memberId);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la génération du QR code:', error);
+            const qrContainer = document.getElementById('qr-code-container');
+            if (qrContainer) {
+                qrContainer.innerHTML = '<div style="color: #ff6b6b;">Erreur de génération du QR code</div>';
+            }
+        }
+    }
+
+    async generateMembershipPDF() {
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Configuration
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            
+            // Récupérer le QR code
+            const qrContainer = document.querySelector('#qr-code-container img');
+            
+            if (qrContainer) {
+                // Convertir l'image QR en canvas puis en image pour le PDF
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const qrImg = new Image();
+                
+                qrImg.onload = () => {
+                    canvas.width = qrImg.width;
+                    canvas.height = qrImg.height;
+                    ctx.drawImage(qrImg, 0, 0);
+                    
+                    const qrData = canvas.toDataURL('image/png');
+                    
+                    // Tentative de chargement du logo ForNap
+                    const logoImg = new Image();
+                    logoImg.crossOrigin = 'anonymous';
+                    
+                    logoImg.onload = () => {
+                        // Ajouter le logo en haut
+                        const logoSize = 40;
+                        const logoX = (pageWidth - logoSize) / 2;
+                        
+                        const logoCanvas = document.createElement('canvas');
+                        const logoCtx = logoCanvas.getContext('2d');
+                        logoCanvas.width = logoImg.width;
+                        logoCanvas.height = logoImg.height;
+                        logoCtx.drawImage(logoImg, 0, 0);
+                        
+                        const logoData = logoCanvas.toDataURL('image/png');
+                        doc.addImage(logoData, 'PNG', logoX, 15, logoSize, logoSize);
+                        
+                        this.finalizePDF(doc, qrData, pageWidth, pageHeight);
+                    };
+                    
+                    logoImg.onerror = () => {
+                        // Si le logo ne charge pas, continuer sans logo
+                        console.log('Logo non trouvé, génération du PDF sans logo');
+                        this.finalizePDF(doc, qrData, pageWidth, pageHeight);
+                    };
+                    
+                    // Tenter de charger le logo
+                    logoImg.src = './logo.png';
+                };
+                
+                qrImg.src = qrContainer.src;
+            } else {
+                this.showError('QR code non trouvé');
+            }
+            
+        } catch (error) {
+            console.error('Erreur lors de la génération du PDF:', error);
+            this.showError('Erreur lors de la génération du PDF');
+        }
+    }
+
+    finalizePDF(doc, qrData, pageWidth, pageHeight) {
+        // Titre
+        doc.setFontSize(24);
+        doc.setFont(undefined, 'bold');
+        doc.text('ForNap - Carte de Membre', pageWidth / 2, 75, { align: 'center' });
+        
+        // Sous-titre
+        doc.setFontSize(16);
+        doc.setFont(undefined, 'normal');
+        doc.text('Early Member', pageWidth / 2, 90, { align: 'center' });
+        
+        // Informations membre
+        if (this.memberData && this.currentMemberId) {
+            doc.setFontSize(12);
+            doc.text(`Nom: ${this.memberData.firstname} ${this.memberData.lastname}`, 20, 115);
+            doc.text(`Email: ${this.memberData.email}`, 20, 130);
+            doc.text(`ID Membre: ${this.currentMemberId}`, 20, 145);
+            doc.text(`Date d'adhésion: ${new Date().toLocaleDateString('fr-FR')}`, 20, 160);
+        }
+        
+        // QR Code (plus grand et centré)
+        const qrSize = 80;
+        const qrX = (pageWidth - qrSize) / 2;
+        const qrY = 180;
+        
+        doc.addImage(qrData, 'PNG', qrX, qrY, qrSize, qrSize);
+        
+        // Instructions
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text('Présentez ce QR code lors de vos visites au ForNap', pageWidth / 2, qrY + qrSize + 20, { align: 'center' });
+        
+        // Footer
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
+        doc.text('Généré automatiquement - ForNap Tiers Lieu Culturel', pageWidth / 2, pageHeight - 15, { align: 'center' });
+        doc.text(`ID: ${this.currentMemberId}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+        
+        // Télécharger le PDF
+        const filename = `ForNap-Carte-Membre-${this.currentMemberId || 'temp'}.pdf`;
+        doc.save(filename);
+        
+        console.log('PDF généré:', filename);
+    }
 }
 
 // Initialize the app when DOM is loaded
@@ -544,6 +703,12 @@ window.continueAsInterested = function() {
 window.upgradeToMember = function() {
     if (window.memberSignupInstance) {
         window.memberSignupInstance.upgradeToMember();
+    }
+};
+
+window.downloadMembershipPDF = function() {
+    if (window.memberSignupInstance) {
+        window.memberSignupInstance.generateMembershipPDF();
     }
 };
 

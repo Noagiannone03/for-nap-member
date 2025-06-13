@@ -56,8 +56,8 @@
                             <div class="card-icon">⭐</div>
                             <h3>Je veux faire partie du projet</h3>
                             <div class="card-price">
-                                <span class="price-amount">12€</span>
-                                <span class="price-period">pour 1 an</span>
+                                <span class="price-amount">0,10€</span>
+                                <span class="price-period">test sandbox</span>
                             </div>
                         </div>
                         <div class="card-content">
@@ -136,8 +136,8 @@
                             <input type="tel" id="member-phone" placeholder="Numéro de téléphone" required>
                         </div>
                         <div class="price-info">
-                            <span class="price">12€</span>
-                            <span class="price-description">Adhésion Early Member</span>
+                            <span class="price">0,10€</span>
+                            <span class="price-description">Test Sandbox</span>
                         </div>
                         <button type="submit" class="submit-btn member-btn">Devenir Early Member</button>
                     </form>
@@ -158,6 +158,21 @@
                     </div>
                     <h2>Bienvenue dans la Team !</h2>
                     <p>Félicitations ! Vous êtes maintenant Early Member de notre tiers lieu culturel.</p>
+                    
+                    <!-- QR Code Section -->
+                    <div class="member-card">
+                        <h3>🎫 Votre Carte de Membre</h3>
+                        <div id="qr-code-container" class="qr-code-display">
+                            <!-- QR code will be generated here -->
+                        </div>
+                        <p class="member-id">ID Membre: <span id="member-id-display">...</span></p>
+                        <p class="qr-instructions">Présentez ce QR code lors de vos visites au ForNap</p>
+                        
+                        <button onclick="downloadMembershipPDF()" class="download-pdf-btn">
+                            📄 Télécharger ma carte PDF
+                        </button>
+                    </div>
+                    
                     <p>Vous recevrez prochainement toutes les informations par email.</p>
                 </div>
 
@@ -245,7 +260,11 @@
         window.addDoc = addDoc;
     </script>
 
-    <!-- HelloAsso API calls will be handled directly in JavaScript -->
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <!-- Main JavaScript -->
     <script src="member-signup.js"></script>
