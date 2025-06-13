@@ -196,7 +196,7 @@ class MemberSignup {
             zipcode: document.getElementById('member-zipcode').value,
             email: document.getElementById('member-email').value,
             phone: document.getElementById('member-phone').value,
-            amount: 2, // 12€ en centimes
+            amount: 1200, // 12€ en centimes
             timestamp: new Date().toISOString()
         };
 
