@@ -282,8 +282,8 @@
         window.addDoc = addDoc;
     </script>
 
-    <!-- QR Code Library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- QR Code Library (QRious - plus fiable) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
     
     <!-- jsPDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -342,42 +342,51 @@
                 this.generateMemberQRCode();
             }
 
-            async generateMemberQRCode() {
+            generateMemberQRCode() {
                 try {
                     const qrContainer = document.getElementById('member-qr-code');
                     if (!qrContainer) return;
 
-                    // Vérifier si QRCode est disponible
-                    if (typeof QRCode === 'undefined') {
-                        console.error('QRCode library not loaded');
-                        qrContainer.innerHTML = `<p style="color: #ff6b6b;">Chargement des librairies...</p>`;
-                        // Attendre un peu et réessayer
-                        setTimeout(() => this.generateMemberQRCode(), 1000);
+                    const qrCodeData = `FORNAP-MEMBER:${this.memberDocumentId}`;
+                    
+                    // Méthode 1: Essayer avec QRious
+                    if (typeof QRious !== 'undefined') {
+                        const canvas = document.createElement('canvas');
+                        const qr = new QRious({
+                            element: canvas,
+                            value: qrCodeData,
+                            size: 250,
+                            background: 'white',
+                            foreground: '#1a1a1a'
+                        });
+
+                        qrContainer.innerHTML = '';
+                        qrContainer.appendChild(canvas);
+                        console.log('QR Code généré avec QRious pour:', this.memberDocumentId);
                         return;
                     }
 
-                    const qrCodeData = `FORNAP-MEMBER:${this.memberDocumentId}`;
+                    // Méthode 2: Fallback avec Google Charts API
+                    const qrSize = 250;
+                    const encodedData = encodeURIComponent(qrCodeData);
+                    const qrUrl = `https://chart.googleapis.com/chart?chs=${qrSize}x${qrSize}&cht=qr&chl=${encodedData}`;
                     
-                    const canvas = document.createElement('canvas');
-                    await QRCode.toCanvas(canvas, qrCodeData, {
-                        width: 250,
-                        margin: 2,
-                        color: {
-                            dark: '#1a1a1a',
-                            light: '#ffffff'
-                        }
-                    });
-
+                    const img = document.createElement('img');
+                    img.src = qrUrl;
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    img.alt = 'QR Code Membre';
+                    
                     qrContainer.innerHTML = '';
-                    qrContainer.appendChild(canvas);
-
-                    console.log('QR Code généré pour le membre:', this.memberDocumentId);
+                    qrContainer.appendChild(img);
+                    
+                    console.log('QR Code généré avec Google Charts pour:', this.memberDocumentId);
 
                 } catch (error) {
                     console.error('Erreur lors de la génération du QR code:', error);
                     const qrContainer = document.getElementById('member-qr-code');
                     if (qrContainer) {
-                        qrContainer.innerHTML = `<p style="color: #ff6b6b;">Erreur lors de la génération du QR code</p>`;
+                        qrContainer.innerHTML = `<p style="color: #ff6b6b;">Erreur QR: ${error.message}</p>`;
                     }
                 }
             }
@@ -390,9 +399,9 @@
                         downloadBtn.disabled = true;
                     }
 
-                    // Vérifier si les librairies sont disponibles
-                    if (typeof QRCode === 'undefined' || typeof window.jspdf === 'undefined') {
-                        alert('Librairies en cours de chargement. Veuillez attendre et réessayer.');
+                    // Vérifier si jsPDF est disponible
+                    if (typeof window.jspdf === 'undefined') {
+                        alert('PDF en cours de chargement. Veuillez attendre et réessayer.');
                         if (downloadBtn) {
                             downloadBtn.textContent = '📄 Télécharger ma carte membre (PDF)';
                             downloadBtn.disabled = false;
@@ -429,19 +438,28 @@
                     pdf.setFont('helvetica', 'normal');
                     pdf.text('Tiers Lieu Culturel', 105, 85, { align: 'center' });
 
-                    // QR Code
+                    // QR Code avec méthodes alternatives
                     const qrCodeData = `FORNAP-MEMBER:${this.memberDocumentId}`;
-                    const qrCanvas = document.createElement('canvas');
-                    await QRCode.toCanvas(qrCanvas, qrCodeData, {
-                        width: 600,
-                        margin: 4,
-                        color: {
-                            dark: '#1a1a1a',
-                            light: '#ffffff'
-                        }
-                    });
+                    let qrDataUrl;
+                    
+                    // Méthode 1: Essayer avec QRious
+                    if (typeof QRious !== 'undefined') {
+                        const qrCanvas = document.createElement('canvas');
+                        const qr = new QRious({
+                            element: qrCanvas,
+                            value: qrCodeData,
+                            size: 400,
+                            background: 'white',
+                            foreground: '#1a1a1a'
+                        });
+                        qrDataUrl = qrCanvas.toDataURL('image/png');
+                    } else {
+                        // Méthode 2: Utiliser Google Charts API
+                        const qrSize = 400;
+                        const encodedData = encodeURIComponent(qrCodeData);
+                        qrDataUrl = `https://chart.googleapis.com/chart?chs=${qrSize}x${qrSize}&cht=qr&chl=${encodedData}`;
+                    }
 
-                    const qrDataUrl = qrCanvas.toDataURL('image/png');
                     const qrSize = 140;
                     const qrX = (210 - qrSize) / 2;
                     const qrY = 110;
@@ -477,21 +495,20 @@
         }
 
         // Fonction pour attendre que les librairies soient chargées
-        function waitForLibraries(callback, maxAttempts = 50) {
+        function waitForLibraries(callback, maxAttempts = 30) {
             let attempts = 0;
             const checkInterval = setInterval(() => {
                 attempts++;
-                if (typeof QRCode !== 'undefined' && typeof window.jspdf !== 'undefined') {
+                if (typeof QRious !== 'undefined' && typeof window.jspdf !== 'undefined') {
                     clearInterval(checkInterval);
                     console.log('Librairies chargées avec succès');
                     callback();
                 } else if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
-                    console.error('Impossible de charger les librairies QRCode et jsPDF');
-                    // Essayer d'initialiser quand même
+                    console.log('Librairies pas toutes chargées, on continue quand même');
                     callback();
                 }
-            }, 100);
+            }, 200);
         }
 
         // Initialiser la page quand les librairies sont prêtes
