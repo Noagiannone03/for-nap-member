@@ -5,18 +5,8 @@ class MemberSignup {
         this.helloAssoClientId = 'b113d06d07884da39d0a6b52482b40bd';
         this.helloAssoClientSecret = 'NMFwtSG1Bt63HkJ2Xn/vqarfTbUJBWsP';
         this.organizationSlug = 'no-id-lab';
-        
-        // Configuration Sandbox/Production
-        this.isTestMode = false; // 🧪 METTRE À FALSE EN PRODUCTION
-        this.baseUrl = this.isTestMode 
-            ? 'https://api.helloasso-sandbox.com/v5' 
-            : 'https://api.helloasso.com/v5';
-        this.oauthUrl = this.isTestMode 
-            ? 'https://api.helloasso-sandbox.com/oauth2' 
-            : 'https://api.helloasso.com/oauth2';
-        
-        // Montant de l'adhésion (en centimes)
-        this.membershipPrice = this.isTestMode ? 100 : 1200; // 1€ en test, 12€ en prod
+        this.baseUrl = 'https://api.helloasso.com/v5';
+        this.oauthUrl = 'https://api.helloasso.com/oauth2';
         
         // URL de retour pour les tests locaux (à changer en production)
         this.testReturnUrl = 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
@@ -27,7 +17,6 @@ class MemberSignup {
     init() {
         this.setupEventListeners();
         this.handleUrlParams(); // Pour gérer les retours de paiement
-        this.showTestModeIndicator(); // Affichage du mode test
     }
 
     setupEventListeners() {
@@ -207,7 +196,7 @@ class MemberSignup {
             zipcode: document.getElementById('member-zipcode').value,
             email: document.getElementById('member-email').value,
             phone: document.getElementById('member-phone').value,
-            amount: this.membershipPrice, // Prix dynamique selon le mode
+            amount: 1200, // 12€ en centimes
             timestamp: new Date().toISOString()
         };
 
@@ -519,59 +508,6 @@ class MemberSignup {
     validateZipCode(zipcode) {
         const zipcodeRegex = /^[0-9]{5}$/;
         return zipcodeRegex.test(zipcode);
-    }
-
-    showTestModeIndicator() {
-        if (this.isTestMode) {
-            const indicator = document.createElement('div');
-            indicator.style.cssText = `
-            position: fixed;
-                top: 10px;
-                right: 10px;
-                background: linear-gradient(135deg, #ff6b35, #f7931e);
-            color: white;
-                padding: 8px 16px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: bold;
-                z-index: 9999;
-                box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
-                animation: pulse 2s infinite;
-            `;
-            indicator.innerHTML = `🧪 MODE TEST - ${this.membershipPrice/100}€`;
-            document.body.appendChild(indicator);
-            
-            // Animation CSS
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes pulse {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.05); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Mettre à jour les prix affichés dans l'interface
-            this.updatePriceDisplay();
-            
-            console.log('🧪 MODE TEST ACTIVÉ - Paiements sur HelloAsso Sandbox');
-            console.log(`💰 Prix test: ${this.membershipPrice/100}€ (au lieu de 12€)`);
-        }
-    }
-
-    updatePriceDisplay() {
-        const priceElements = document.querySelectorAll('.price-amount, .price');
-        priceElements.forEach(element => {
-            if (element.textContent.includes('12€') || element.textContent.includes('12')) {
-                element.textContent = `${this.membershipPrice/100}€`;
-                if (this.isTestMode) {
-                    element.style.backgroundColor = '#ff6b35';
-                    element.style.padding = '2px 6px';
-                    element.style.borderRadius = '4px';
-                    element.style.fontSize = '0.9em';
-                }
-            }
-        });
     }
 
     showError(message) {
