@@ -9,7 +9,7 @@ class MemberSignup {
         this.oauthUrl = 'https://api.helloasso.com/oauth2';
         
         // URL de retour pour les tests locaux (à changer en production)
-        this.testReturnUrl = 'https://no-id-lab.example.com/return';
+        this.testReturnUrl = 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
         
         this.init();
     }
@@ -265,7 +265,9 @@ class MemberSignup {
             // Construction des URLs de retour sécurisées
             const currentUrl = window.location.href.split('?')[0]; // Enlever les paramètres existants
             const isLocal = currentUrl.includes('localhost') || currentUrl.includes('file://') || currentUrl.includes('127.0.0.1');
-            const baseReturnUrl = isLocal ? this.testReturnUrl : currentUrl;
+            
+            // Utiliser l'URL GitHub Pages pour tous les environnements
+            const baseReturnUrl = isLocal ? this.testReturnUrl : 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
 
             const checkoutData = {
                 totalAmount: formData.amount,
