@@ -205,7 +205,7 @@ class MemberSignup {
             zipcode: document.getElementById('member-zipcode').value,
             email: document.getElementById('member-email').value,
             phone: document.getElementById('member-phone').value,
-            amount: 50, // 50 centimes (minimum HelloAsso)
+            amount: 55, // 55 centimes (minimum HelloAsso)
             timestamp: new Date().toISOString()
         };
 
