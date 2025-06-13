@@ -205,7 +205,7 @@ class MemberSignup {
             zipcode: document.getElementById('member-zipcode').value,
             email: document.getElementById('member-email').value,
             phone: document.getElementById('member-phone').value,
-            amount: 10, // 0,10€ en centimes (pour test)
+            amount: 0, // Gratuit pour les tests
             timestamp: new Date().toISOString()
         };
 
@@ -590,31 +590,15 @@ class MemberSignup {
             pdf.setFontSize(20);
             pdf.text('ForNap - Early Member', 105, 45, { align: 'center' });
 
-            // Logo (si disponible)
-            try {
-                const logoImg = document.getElementById('logo-img');
-                if (logoImg && logoImg.src) {
-                    // Créer un canvas pour convertir l'image
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const img = new Image();
-                    
-                    await new Promise((resolve) => {
-                        img.onload = () => {
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            ctx.drawImage(img, 0, 0);
-                            
-                            const logoData = canvas.toDataURL('image/png');
-                            pdf.addImage(logoData, 'PNG', 85, 55, 40, 40);
-                            resolve();
-                        };
-                        img.src = logoImg.src;
-                    });
-                }
-            } catch (logoError) {
-                console.log('Logo non disponible, continuons sans');
-            }
+            // Logo ForNap (texte stylisé en or)
+            pdf.setTextColor(goldColor[0], goldColor[1], goldColor[2]);
+            pdf.setFontSize(16);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('🔥 ForNap', 105, 70, { align: 'center' });
+            
+            pdf.setFontSize(12);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('Tiers Lieu Culturel', 105, 85, { align: 'center' });
 
             // QR Code (prend le maximum de place)
             const qrCodeData = `FORNAP-MEMBER:${this.memberDocumentId}`;
