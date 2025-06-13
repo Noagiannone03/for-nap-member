@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Félicitations ! - ForNap Early Member</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .celebration-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .success-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .success-subtitle {
+            font-size: 18px;
+            color: #b0b0b0;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .member-card-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ff8e8e;
+        }
+
+        .qr-code-container {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px auto;
+            display: inline-block;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .qr-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            color: #333;
+            padding: 40px;
+        }
+
+        .qr-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ff6b6b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .qr-info {
+            font-size: 14px;
+            color: #b0b0b0;
+            margin-top: 15px;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: #ffffff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .download-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .benefits-list {
+            text-align: left;
+            margin: 25px 0;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+
+        .benefit-icon {
+            font-size: 20px;
+        }
+
+        .benefit-text {
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .back-home-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+
+        .back-home-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .member-id {
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #ff8e8e;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 142, 142, 0.2);
+        }
+
+        .email-info {
+            font-size: 14px;
+            color: #b0b0b0;
+            margin-top: 25px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="celebration-icon">🎊</div>
+        
+        <h1 class="success-title">Félicitations !</h1>
+        <p class="success-subtitle">
+            Vous êtes désormais officiellement membre <strong>ForNap Early Bird</strong> !<br>
+            Bienvenue dans notre communauté de pionniers.
+        </p>
+
+        <div class="member-card-section">
+            <h3 class="card-title">🎫 Votre carte de membre digitale</h3>
+            <div id="member-qr-code" class="qr-code-container">
+                <div class="qr-loading">
+                    <div class="qr-loading-spinner"></div>
+                    <span>Génération de votre QR code...</span>
+                </div>
+            </div>
+            <p class="qr-info">Scannez ce code pour accéder à vos avantages membres</p>
+            
+            <button id="download-member-card" class="download-btn">
+                📄 Télécharger ma carte membre (PDF)
+            </button>
+
+            <div id="member-id" class="member-id" style="display: none;">
+                ID Membre: <span id="member-id-value"></span>
+            </div>
+        </div>
+
+        <div class="benefits-list">
+            <div class="benefit-item">
+                <div class="benefit-icon">🎫</div>
+                <div class="benefit-text">Place festival au Fort gratuite (valeur 15€)</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-icon">🏢</div>
+                <div class="benefit-text">Accès exclusif à l'espace ForNap</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-icon">🗳️</div>
+                <div class="benefit-text">Droit de vote pour les décisions du Fort</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-icon">🎯</div>
+                <div class="benefit-text">Programme fidélité exclusif</div>
+            </div>
+        </div>
+
+        <p class="email-info">
+            📧 Vous recevrez également toutes les informations par email dans les prochaines minutes.
+        </p>
+
+        <button class="back-home-btn" onclick="window.location.href='member-signup.html'">
+            ← Retour à l'accueil
+        </button>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyALz161yfiLaOeHU82DQNJV4PkzAXO1wzM",
+            authDomain: "nap-7aa80.firebaseapp.com",
+            projectId: "nap-7aa80",
+            storageBucket: "nap-7aa80.firebasestorage.app",
+            messagingSenderId: "434731738248",
+            appId: "1:434731738248:web:481644f3a6e809c06d2b3d",
+            measurementId: "G-3HVC6HNG02"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+    </script>
+
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        class SuccessPage {
+            constructor() {
+                this.memberDocumentId = null;
+                this.memberData = null;
+                this.init();
+            }
+
+            init() {
+                this.handleUrlParams();
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                const downloadBtn = document.getElementById('download-member-card');
+                if (downloadBtn) {
+                    downloadBtn.addEventListener('click', () => {
+                        this.downloadMemberCard();
+                    });
+                }
+            }
+
+            handleUrlParams() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const memberData = urlParams.get('data');
+                
+                if (memberData) {
+                    try {
+                        this.memberData = JSON.parse(decodeURIComponent(memberData));
+                        this.memberDocumentId = this.memberData.id || 'member-' + Date.now();
+                        
+                        console.log('Données membre récupérées:', this.memberData);
+                        
+                        // Afficher l'ID membre
+                        const memberIdElement = document.getElementById('member-id');
+                        const memberIdValue = document.getElementById('member-id-value');
+                        if (memberIdElement && memberIdValue) {
+                            memberIdValue.textContent = this.memberDocumentId;
+                            memberIdElement.style.display = 'block';
+                        }
+                        
+                    } catch (error) {
+                        console.error('Erreur lors du parsing des données:', error);
+                        this.memberDocumentId = 'member-' + Date.now();
+                    }
+                } else {
+                    // Fallback si pas de données
+                    this.memberDocumentId = 'member-' + Date.now();
+                }
+                
+                // Générer le QR code dans tous les cas
+                this.generateMemberQRCode();
+            }
+
+            async generateMemberQRCode() {
+                try {
+                    const qrContainer = document.getElementById('member-qr-code');
+                    if (!qrContainer) return;
+
+                    const qrCodeData = `FORNAP-MEMBER:${this.memberDocumentId}`;
+                    
+                    const canvas = document.createElement('canvas');
+                    await QRCode.toCanvas(canvas, qrCodeData, {
+                        width: 250,
+                        margin: 2,
+                        color: {
+                            dark: '#1a1a1a',
+                            light: '#ffffff'
+                        }
+                    });
+
+                    qrContainer.innerHTML = '';
+                    qrContainer.appendChild(canvas);
+
+                    console.log('QR Code généré pour le membre:', this.memberDocumentId);
+
+                } catch (error) {
+                    console.error('Erreur lors de la génération du QR code:', error);
+                    const qrContainer = document.getElementById('member-qr-code');
+                    if (qrContainer) {
+                        qrContainer.innerHTML = `<p style="color: #ff6b6b;">Erreur lors de la génération du QR code</p>`;
+                    }
+                }
+            }
+
+            async downloadMemberCard() {
+                try {
+                    const downloadBtn = document.getElementById('download-member-card');
+                    if (downloadBtn) {
+                        downloadBtn.textContent = '📄 Génération en cours...';
+                        downloadBtn.disabled = true;
+                    }
+
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('portrait', 'mm', 'a4');
+                    
+                    const darkColor = [26, 26, 26];
+                    const accentColor = [255, 107, 107];
+
+                    // Background
+                    pdf.setFillColor(darkColor[0], darkColor[1], darkColor[2]);
+                    pdf.rect(0, 0, 210, 297, 'F');
+
+                    // Titre
+                    pdf.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
+                    pdf.setFontSize(28);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('CARTE MEMBRE', 105, 30, { align: 'center' });
+                    
+                    pdf.setFontSize(20);
+                    pdf.text('ForNap - Early Member', 105, 45, { align: 'center' });
+
+                    // Logo
+                    pdf.setTextColor(255, 142, 142);
+                    pdf.setFontSize(16);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('🔥 ForNap', 105, 70, { align: 'center' });
+                    
+                    pdf.setFontSize(12);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('Tiers Lieu Culturel', 105, 85, { align: 'center' });
+
+                    // QR Code
+                    const qrCodeData = `FORNAP-MEMBER:${this.memberDocumentId}`;
+                    const qrCanvas = document.createElement('canvas');
+                    await QRCode.toCanvas(qrCanvas, qrCodeData, {
+                        width: 600,
+                        margin: 4,
+                        color: {
+                            dark: '#1a1a1a',
+                            light: '#ffffff'
+                        }
+                    });
+
+                    const qrDataUrl = qrCanvas.toDataURL('image/png');
+                    const qrSize = 140;
+                    const qrX = (210 - qrSize) / 2;
+                    const qrY = 110;
+                    
+                    pdf.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+
+                    // Informations
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(12);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('Scannez ce code pour accéder à vos avantages membres', 105, 270, { align: 'center' });
+                    
+                    pdf.setFontSize(10);
+                    pdf.text(`ID Membre: ${this.memberDocumentId}`, 105, 280, { align: 'center' });
+                    pdf.text(`Généré le: ${new Date().toLocaleDateString('fr-FR')}`, 105, 290, { align: 'center' });
+
+                    pdf.save(`ForNap-Carte-Membre-${this.memberDocumentId}.pdf`);
+
+                    if (downloadBtn) {
+                        downloadBtn.textContent = '📄 Télécharger ma carte membre (PDF)';
+                        downloadBtn.disabled = false;
+                    }
+
+                } catch (error) {
+                    console.error('Erreur lors de la génération du PDF:', error);
+                    const downloadBtn = document.getElementById('download-member-card');
+                    if (downloadBtn) {
+                        downloadBtn.textContent = '📄 Télécharger ma carte membre (PDF)';
+                        downloadBtn.disabled = false;
+                    }
+                }
+            }
+        }
+
+        // Initialiser la page
+        document.addEventListener('DOMContentLoaded', () => {
+            new SuccessPage();
+        });
+    </script>
+</body>
+</html> 

@@ -278,13 +278,22 @@ class MemberSignup {
             // Utiliser l'URL GitHub Pages pour tous les environnements
             const baseReturnUrl = isLocal ? this.testReturnUrl : 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
 
+            // Sauvegarder d'abord en Firebase pour avoir un ID
+            const memberDocId = await this.saveToFirebase('members', {
+                ...formData,
+                paymentStatus: 'pending'
+            });
+            
+            this.memberDocumentId = memberDocId;
+            console.log('Membre pré-enregistré avec ID:', memberDocId);
+
             const checkoutData = {
                 totalAmount: formData.amount,
                 initialAmount: formData.amount,
                 itemName: 'Adhésion Early Member - ForNap',
-                backUrl: baseReturnUrl + '?status=cancelled',
-                errorUrl: baseReturnUrl + '?status=error', 
-                returnUrl: baseReturnUrl + '?status=success',
+                backUrl: baseReturnUrl + '?status=cancelled&memberid=' + memberDocId,
+                errorUrl: baseReturnUrl + '?status=error&memberid=' + memberDocId, 
+                returnUrl: baseReturnUrl + '?status=success&memberid=' + memberDocId,
                 containsDonation: false,
                 payer: {
                     firstName: formData.firstname,
@@ -299,7 +308,8 @@ class MemberSignup {
                     userId: formData.email,
                     membershipType: 'early-member',
                     age: formData.age.toString(),
-                    phone: formData.phone
+                    phone: formData.phone,
+                    memberDocumentId: memberDocId
                 }
             };
 
@@ -401,11 +411,12 @@ class MemberSignup {
         const urlParams = new URLSearchParams(window.location.search);
         const status = urlParams.get('status');
         const sessionId = urlParams.get('session_id');
+        const memberId = urlParams.get('memberid');
         
         if (status) {
             switch (status) {
                 case 'success':
-                    this.handlePaymentSuccess(sessionId);
+                    this.handlePaymentSuccess(sessionId, memberId);
                     break;
                 case 'cancelled':
                     this.handlePaymentCancelled();
@@ -420,38 +431,30 @@ class MemberSignup {
         }
     }
 
-        async handlePaymentSuccess(sessionId) {
-        console.log('Paiement réussi, session:', sessionId);
+    async handlePaymentSuccess(sessionId, memberId) {
+        console.log('Paiement réussi, session:', sessionId, 'memberId:', memberId);
         
         try {
-            // Si on a des données de formulaire temporaires, les sauvegarder
-            if (this.currentFormData) {
-                this.currentFormData.paymentStatus = 'completed';
-                this.currentFormData.sessionId = sessionId;
-                
-                // Sauvegarder en Firebase et récupérer l'ID du document
-                this.memberDocumentId = await this.saveToFirebase('members', this.currentFormData);
-                console.log('Membre sauvegardé avec ID:', this.memberDocumentId);
-                
-                this.currentFormData = null;
-            }
+            // Utiliser l'ID du membre passé en paramètre
+            this.memberDocumentId = memberId || this.memberDocumentId || 'member-' + Date.now();
             
-            // Afficher le succès
-            this.hideAllForms();
-            setTimeout(() => {
-                document.getElementById('success-member').classList.remove('hidden');
-                // Générer le QR code après l'affichage
-                this.generateMemberQRCode();
-            }, 300);
+            // Rediriger vers la page de succès dédiée
+            const successData = {
+                id: this.memberDocumentId,
+                sessionId: sessionId,
+                timestamp: new Date().toISOString()
+            };
+            
+            const successUrl = `success.html?data=${encodeURIComponent(JSON.stringify(successData))}`;
+            window.location.href = successUrl;
 
         } catch (error) {
-            console.error('Erreur lors de la sauvegarde après paiement:', error);
-            // Même en cas d'erreur de sauvegarde, afficher le succès car le paiement a été effectué
+            console.error('Erreur lors de la redirection:', error);
+            // Fallback vers l'affichage local
+            this.memberDocumentId = memberId || sessionId || 'member-' + Date.now();
             this.hideAllForms();
             setTimeout(() => {
                 document.getElementById('success-member').classList.remove('hidden');
-                // Générer un QR code avec session ID en fallback
-                this.memberDocumentId = sessionId || 'temp-' + Date.now();
                 this.generateMemberQRCode();
             }, 300);
         }
