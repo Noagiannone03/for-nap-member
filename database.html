@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Fort - Vision et Structure de Base de Données</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            background-color: #f8f9fa;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        .db-table {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin: 15px 0;
+            padding: 15px;
+        }
+        .field {
+            font-family: monospace;
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏰 Le Fort - Vision et Structure Technique</h1>
+    
+    <div class="section">
+        <h2>📋 Résumé Exécutif</h2>
+        <p><strong>Le Fort</strong> est un projet de lieu multi-fonctionnel innovant qui combine espace de coworking, café-restaurant, boutique et centre culturel. L'objectif principal est de créer une <strong>communauté d'adhérents engagés</strong> plutôt qu'une simple clientèle de passage.</p>
+        
+        <h3>🎯 Objectifs Stratégiques</h3>
+        <ul>
+            <li><strong>Ouverture</strong> : Septembre 2026 avec 70-80% des services opérationnels</li>
+            <li><strong>Modèle économique</strong> : Système d'adhésion avec niveaux de fidélité</li>
+            <li><strong>Fonctionnement</strong> : Lieu privé associatif, public week-end uniquement</li>
+            <li><strong>Digital-first</strong> : Plateforme web centralisée pour tous les services</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🏢 Espaces et Services</h2>
+        <table>
+            <tr>
+                <th>Espace</th>
+                <th>Fonction</th>
+                <th>Priorité Ouverture</th>
+                <th>Horaires</th>
+            </tr>
+            <tr>
+                <td>Café-Bar</td>
+                <td>Point de rencontre social</td>
+                <td>🔴 Critique</td>
+                <td>Selon adhésion</td>
+            </tr>
+            <tr>
+                <td>Restaurant</td>
+                <td>Restauration, brunch</td>
+                <td>🔴 Critique</td>
+                <td>Selon adhésion</td>
+            </tr>
+            <tr>
+                <td>Shop (Jardinerie + Boutique)</td>
+                <td>Vente produits</td>
+                <td>🔴 Critique</td>
+                <td>Week-end public</td>
+            </tr>
+            <tr>
+                <td>Coworking</td>
+                <td>Bureaux indépendants</td>
+                <td>🔴 Critique</td>
+                <td>Lundi-Vendredi</td>
+            </tr>
+            <tr>
+                <td>Espaces Collaboration</td>
+                <td>Événements, résidence</td>
+                <td>🟡 Secondaire</td>
+                <td>Sur réservation</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>👥 Système de Membres</h2>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Prix</th>
+                <th>Durée</th>
+                <th>Avantages</th>
+                <th>Critères</th>
+            </tr>
+            <tr>
+                <td>Adhérent Mensuel</td>
+                <td>2€</td>
+                <td>1 mois</td>
+                <td>Accès de base</td>
+                <td>Paiement simple</td>
+            </tr>
+            <tr>
+                <td>Adhérent Annuel</td>
+                <td>12€</td>
+                <td>1 an</td>
+                <td>Points fidélité, profil détaillé</td>
+                <td>Engagement long terme</td>
+            </tr>
+            <tr>
+                <td>Adhérent Actif</td>
+                <td>Variable</td>
+                <td>Variable</td>
+                <td>-20% achats, événements exclusifs</td>
+                <td>Aide régulière au lieu</td>
+            </tr>
+            <tr>
+                <td>Bienfaiteur</td>
+                <td>Dons</td>
+                <td>Variable</td>
+                <td>Reconnaissance spéciale</td>
+                <td>Dons financiers significatifs</td>
+            </tr>
+            <tr>
+                <td>Membre d'Honneur</td>
+                <td>Gratuit</td>
+                <td>À vie</td>
+                <td>Accès permanent</td>
+                <td>Service exceptionnel rendu</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>💾 Structure de Base de Données</h2>
+        
+        <div class="db-table">
+            <h3>🏠 Table: users</h3>
+            <table>
+                <tr><th>Champ</th><th>Type</th><th>Description</th></tr>
+                <tr><td class="field">id</td><td>UUID PRIMARY KEY</td><td>Identifiant unique</td></tr>
+                <tr><td class="field">email</td><td>VARCHAR(255) UNIQUE</td><td>Adresse email</td></tr>
+                <tr><td class="field">password_hash</td><td>VARCHAR(255)</td><td>Mot de passe chiffré</td></tr>
+                <tr><td class="field">first_name</td><td>VARCHAR(100)</td><td>Prénom</td></tr>
+                <tr><td class="field">last_name</td><td>VARCHAR(100)</td><td>Nom</td></tr>
+                <tr><td class="field">phone</td><td>VARCHAR(20)</td><td>Téléphone</td></tr>
+                <tr><td class="field">date_of_birth</td><td>DATE</td><td>Date de naissance</td></tr>
+                <tr><td class="field">address</td><td>TEXT</td><td>Adresse complète</td></tr>
+                <tr><td class="field">profession</td><td>VARCHAR(255)</td><td>Métier/Profession</td></tr>
+                <tr><td class="field">company</td><td>VARCHAR(255)</td><td>Entreprise</td></tr>
+                <tr><td class="field">is_entrepreneur</td><td>BOOLEAN</td><td>Travaille pour soi</td></tr>
+                <tr><td class="field">interests</td><td>JSON</td><td>Centres d'intérêt</td></tr>
+                <tr><td class="field">skills</td><td>JSON</td><td>Compétences</td></tr>
+                <tr><td class="field">dietary_preferences</td><td>JSON</td><td>Préférences alimentaires</td></tr>
+                <tr><td class="field">profile_completion</td><td>INTEGER</td><td>% de profil complété</td></tr>
+                <tr><td class="field">created_at</td><td>TIMESTAMP</td><td>Date création</td></tr>
+                <tr><td class="field">updated_at</td><td>TIMESTAMP</td><td>Dernière MAJ</td></tr>
+            </table>
+        </div>
+
+        <div class="db-table">
+            <h3>🎫 Table: memberships</h3>
+            <table>
+                <tr><th>Champ</th><th>Type</th><th>Description</th></tr>
+                <tr><td class="field">id</td><td>UUID PRIMARY KEY</td><td>ID adhésion</td></tr>
+                <tr><td class="field">user_id</td><td>UUID FOREIGN KEY</td><td>Référence utilisateur</td></tr>
+                <tr><td class="field">type</td><td>ENUM</td><td>mensuel, annuel, actif, bienfaiteur, honneur</td></tr>
+                <tr><td class="field">status</td><td>ENUM</td><td>active, expired, suspended</td></tr>
+                <tr><td class="field">start_date</td><td>DATE</td><td>Date début</td></tr>
+                <tr><td class="field">end_date</td><td>DATE</td><td>Date fin</td></tr>
+                <tr><td class="field">amount_paid</td><td>DECIMAL(10,2)</td><td>Montant payé</td></tr>
+                <tr><td class="field">payment_method</td><td>VARCHAR(50)</td><td>Mode de paiement</td></tr>
+                <tr><td class="field">auto_renewal</td><td>BOOLEAN</td><td>Renouvellement auto</td></tr>
+                <tr><td class="field">special_status</td><td>VARCHAR(100)</td><td>Statut spécial si applicable</td></tr>
+                <tr><td class="field">created_at</td><td>TIMESTAMP</td><td>Date création</td></tr>
+            </table>
+        </div>
+
+        <div class="db-table">
+            <h3>⭐ Table: loyalty_points</h3>
+            <table>
+                <tr><th>Champ</th><th>Type</th><th>Description</th></tr>
+                <tr><td class="field">id</td><td>UUID PRIMARY KEY</td><td>ID transaction points</td></tr>
+                <tr><td class="field">user_id</td><td>UUID FOREIGN KEY</td><td>Référence utilisateur</td></tr>
+                <tr><td class="field">points</td><td>INTEGER</td><td>Nombre de points</td></tr>
+                <tr><td class="field">transaction_type</td><td>ENUM</td><td>earned, spent, expired</td></tr>
+                <tr><td class="field">source</td><td>VARCHAR(100)</td><td>Source des points</td></tr>
+                <tr><td class="field">reference_id</td><td>UUID</td><td>Référence achat/action</td></tr>
+                <tr><td class="field">description</td><td>TEXT</td><td>Description transaction</td></tr>
+                <tr><td class="field">created_at</td><td>TIMESTAMP</td><td>Date transaction</td></tr>
+            </table>
+        </div>
+
+        <div class="db-table">
+            <h3>🛒 Table: orders</h3>
+            <table>
+                <tr><th>Champ</th><th>Type</th><th>Description</th></tr>
+                <tr><td class="field">id</td><td>UUID PRIMARY KEY</td><td>ID commande</td></tr>
+                <tr><td class="field">user_id</td><td>UUID FOREIGN KEY</td><td>Référence utilisateur</td></tr>
+                <tr><td class="field">order_number</td><td>VARCHAR(20) UNIQUE</td><td>Numéro commande</td></tr>
+                <tr><td class="field">total_amount</td><td>DECIMAL(10,2)</td><td>Montant total</td></tr>
+                <tr><td class="field">discount_amount</td><td>DECIMAL(10,2)</td><td>Remise appliquée</td></tr>
+                <tr><td class="field">points_used</td><td>INTEGER</td><td>Points utilisés</td></tr>
+                <tr><td class="field">points_earned</td><td>INTEGER</td><td>Points gagnés</td></tr>
+                <tr><td class="field">order_type</td><td>ENUM</td><td>cafe, restaurant, shop, event</td></tr>
+                <tr><td class="field">status</td><td>ENUM</td><td>pending, confirmed, completed, cancelled</td></tr>
+                <tr><td class="field">created_at</td><td>TIMESTAMP</td><td>Date commande</td></tr>
+            </table>
+        </div>
+
+        <div class="db-table">
+            <h3>📅 Table: events</h3>
+            <table>
+                <tr><th>Champ</th><th>Type</th><th>Description</th></tr>
+                <tr><td class="field">id</td><td>UUID PRIMARY KEY</td><td>ID événement</td></tr>
+                <tr><td class="field">title</td><td>VARCHAR(255)</td><td>Titre événement</td></tr>
+                <tr><td class="field">description</td><td>TEXT</td><td>Description</td></tr>
+                <tr><td class="field">start_date</td><td>TIMESTAMP</td><td>Date/heure début</td></tr>
+                <tr><td class="field">end_date</td><td>TIMESTAMP</td><td>Date/heure fin</td></tr>
+                <tr><td class="field">max_participants</td><td>INTEGER</td><td>Nombre max participants</td></tr>
+                <tr><td class="field">price</td><td>DECIMAL(10,2)</td><td>Prix entrée</td></tr>
+                <tr><td class="field">member_price</td><td>DECIMAL(10,2)</td><td>Prix membre</td></tr>
+                <tr><td class="field">requires_membership</td><td>BOOLEAN</td><td>Adhésion obligatoire</td></tr>
+                <tr><td class="field">category</td><td>VARCHAR(100)</td><td>Catégorie événement</td></tr>
+                <tr><td class="field">status</td><td>ENUM</td><td>draft, published, cancelled</td></tr>
+                <tr><td class="field">created_at</td><td>TIMESTAMP</td><td>Date création</td></tr>
+            </table>
+        </div>
+
+        <div class="db-table">
+            <h3>📊 Table: user_interactions</h3>
+            <table>
+                <tr><th>Champ</th><th>Type</th><th>Description</th></tr>
+                <tr><td class="field">id</td><td>UUID PRIMARY KEY</td><td>ID interaction</td></tr>
+                <tr><td class="field">user_id</td><td>UUID FOREIGN KEY</td><td>Référence utilisateur</td></tr>
+                <tr><td class="field">interaction_type</td><td>VARCHAR(100)</td><td>Type interaction</td></tr>
+                <tr><td class="field">page_visited</td><td>VARCHAR(255)</td><td>Page visitée</td></tr>
+                <tr><td class="field">duration</td><td>INTEGER</td><td>Durée en secondes</td></tr>
+                <tr><td class="field">device_type</td><td>VARCHAR(50)</td><td>Type d'appareil</td></tr>
+                <tr><td class="field">metadata</td><td>JSON</td><td>Données supplémentaires</td></tr>
+                <tr><td class="field">created_at</td><td>TIMESTAMP</td><td>Date interaction</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🎯 Stratégie de Gamification</h2>
+        <h3>Système de Points</h3>
+        <ul>
+            <li><strong>Achat café/bar</strong> : 1 point par euro dépensé</li>
+            <li><strong>Restaurant</strong> : 2 points par euro dépensé</li>
+            <li><strong>Shop</strong> : 1 point par euro dépensé</li>
+            <li><strong>Profil complété</strong> : 50 points bonus</li>
+            <li><strong>Parrainage</strong> : 100 points par nouveau membre</li>
+            <li><strong>Participation sondage</strong> : 10 points</li>
+        </ul>
+
+        <h3>Récompenses</h3>
+        <ul>
+            <li><strong>100 points</strong> : Café offert</li>
+            <li><strong>250 points</strong> : 10% de réduction prochaine commande</li>
+            <li><strong>500 points</strong> : Accès événement exclusif</li>
+            <li><strong>1000 points</strong> : Repas gratuit</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>📱 Fonctionnalités Platform Digitale</h2>
+        <h3>Site Web Principal</h3>
+        <ul>
+            <li><strong>Inscription/Connexion</strong> avec profil détaillé</li>
+            <li><strong>Boutique en ligne</strong> avec système de points</li>
+            <li><strong>Réservation</strong> espaces coworking et événements</li>
+            <li><strong>Communication personnalisée</strong> selon profil</li>
+            <li><strong>Sondages interactifs</strong> pour choix programmation</li>
+            <li><strong>Dashboard membre</strong> avec statistiques personnelles</li>
+        </ul>
+
+        <h3>Analytics et Suivi</h3>
+        <ul>
+            <li><strong>Comportement utilisateur</strong> : pages visitées, temps passé</li>
+            <li><strong>Conversion</strong> : visiteur → adhérent → actif</li>
+            <li><strong>Satisfaction</strong> : NPS, feedback événements</li>
+            <li><strong>Engagement</strong> : fréquence visite, participation</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🚀 Roadmap de Déploiement</h2>
+        <table>
+            <tr>
+                <th>Phase</th>
+                <th>Période</th>
+                <th>Objectifs</th>
+                <th>Fonctionnalités</th>
+            </tr>
+            <tr>
+                <td>Phase 1 - MVP</td>
+                <td>Immédiat</td>
+                <td>Base technique</td>
+                <td>Inscription, profils, paiements</td>
+            </tr>
+            <tr>
+                <td>Phase 2 - Pré-ouverture</td>
+                <td>6 mois avant ouverture</td>
+                <td>Construction communauté</td>
+                <td>Événements, sondages, communication</td>
+            </tr>
+            <tr>
+                <td>Phase 3 - Lancement</td>
+                <td>Septembre 2026</td>
+                <td>Ouverture physique</td>
+                <td>Réservations, commandes, points</td>
+            </tr>
+            <tr>
+                <td>Phase 4 - Optimisation</td>
+                <td>Post-ouverture</td>
+                <td>Analytics et amélioration</td>
+                <td>IA recommandations, app mobile</td>
+            </tr>
+        </table>
+    </div>
+
+    <footer style="margin-top: 50px; padding: 20px; background-color: #34495e; color: white; text-align: center;">
+        <p><strong>Le Fort</strong> - Vision Technique et Base de Données</p>
+        <p>Document généré le: <span id="date"></span></p>
+    </footer>
+
+    <script>
+        document.getElementById('date').textContent = new Date().toLocaleDateString('fr-FR');
+    </script>
+</body>
+</html>

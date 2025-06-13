@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiers Lieu Culturel - Inscription</title>
+    <link rel="stylesheet" href="member-signup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header avec logo -->
+        <header class="header">
+            <div class="logo">
+                <img src="logo.svg" alt="Logo Tiers Lieu" id="logo-img">
+            </div>
+        </header>
+
+        <!-- Section principale -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                <h1 class="title">Un Nouveau Tiers Lieu Culturel Arrive Bientôt</h1>
+                <p class="description">
+                    Soyez parmi les premiers à découvrir notre espace culturel innovant. 
+                    Un lieu de rencontre, de création et d'échange qui ouvrira ses portes très prochainement.
+                    Rejoignez-nous dès maintenant !
+                </p>
+
+                <!-- Choice Cards -->
+                <div class="choice-container">
+                    <div class="choice-card interested-card" data-option="interested">
+                        <div class="card-header">
+                            <div class="card-icon">📧</div>
+                            <h3>Je suis intéressé(e)</h3>
+                            <div class="card-badge">Gratuit</div>
+                        </div>
+                        <div class="card-content">
+                            <p>Restez informé(e) de l'ouverture et des premiers événements</p>
+                            <ul class="simple-benefits">
+                                <li>Newsletter exclusive du Fort</li>
+                                <li>Informations en avant-première</li>
+                                <li>Invitations aux prochains événements</li>
+                            </ul>
+                        </div>
+                        <div class="card-action">
+                            <button class="choice-btn interested-btn">
+                                <span>M'inscrire gratuitement</span>
+                                <div class="btn-arrow">→</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="choice-card member-card premium" data-option="member">
+                        <div class="premium-badge">🔥 EARLY BIRD</div>
+                        <div class="card-header">
+                            <div class="card-icon">⭐</div>
+                            <h3>Je veux faire partie du projet</h3>
+                            <div class="card-price">
+                                <span class="price-amount">12€</span>
+                                <span class="price-period">pour 1 an</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <p><strong>Devenez Early Member</strong> et profitez d'avantages exclusifs !</p>
+                            <ul class="premium-benefits">
+                                <li class="highlight">🎫 <strong>Place festival au Fort</strong> à venir... (valeur 15€)</li>
+                                <li>🏢 <strong>Accès exclusif au ForNap</strong> (espace membres)</li>
+                                <li>🗳️ Droit de vote pour les décisions du Fort</li>
+                                <li>🎯 Programme fidélité exclusif</li>
+                                <li>🏆 Statut d'Early Member</li>
+                            </ul>
+                            <div class="value-highlight">
+                                <span class="value-text">Valeur totale : <strong>50€+</strong></span>
+                                <span class="savings">Accès 1 an pour 12€ seulement !</span>
+                            </div>
+                        </div>
+                        <div class="card-action">
+                            <button class="choice-btn member-btn premium-btn">
+                                <span>Devenir Early Member</span>
+                                <div class="btn-arrow">🚀</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulaire Intéressé -->
+                <div id="interested-form" class="form-container hidden">
+                    <h2>Restez informé(e)</h2>
+                    <form id="interested-signup">
+                        <div class="input-group">
+                            <input type="text" id="interested-firstname" placeholder="Prénom" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" id="interested-email" placeholder="Email" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="tel" id="interested-phone" placeholder="Téléphone" required>
+                        </div>
+                        <button type="submit" class="submit-btn">M'inscrire aux updates</button>
+                    </form>
+                </div>
+
+                <!-- Formulaire Membre -->
+                <div id="member-form" class="form-container hidden">
+                    <h2>Devenir Early Member</h2>
+                    <div class="member-benefits">
+                        <h4>Avantages Early Member :</h4>
+                        <ul>
+                            <li>Accès prioritaire aux événements</li>
+                            <li>Tarifs préférentiels</li>
+                            <li>Participation aux décisions communautaires</li>
+                            <li>Espace de travail dédié</li>
+                        </ul>
+                    </div>
+                    <form id="member-signup">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <input type="text" id="member-lastname" placeholder="Nom" required>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" id="member-firstname" placeholder="Prénom" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <input type="number" id="member-age" placeholder="Âge" min="16" max="99" required>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" id="member-zipcode" placeholder="Code postal" pattern="[0-9]{5}" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" id="member-email" placeholder="Email" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="tel" id="member-phone" placeholder="Numéro de téléphone" required>
+                        </div>
+                        <div class="price-info">
+                            <span class="price">12€</span>
+                            <span class="price-description">Adhésion Early Member</span>
+                        </div>
+                        <button type="submit" class="submit-btn member-btn">Devenir Early Member</button>
+                    </form>
+                </div>
+
+                <!-- Success Messages -->
+                <div id="success-interested" class="success-message hidden">
+                    <div class="success-animation">
+                        <div class="checkmark">✓</div>
+                    </div>
+                    <h2>Merci !</h2>
+                    <p>Nous vous tiendrons informé(e) de l'ouverture du tiers lieu. Stay tuned ! 🎉</p>
+                </div>
+
+                <div id="success-member" class="success-message hidden">
+                    <div class="success-animation">
+                        <div class="celebration">🎊</div>
+                    </div>
+                    <h2>Bienvenue dans la Team !</h2>
+                    <p>Félicitations ! Vous êtes maintenant Early Member de notre tiers lieu culturel.</p>
+                    <p>Vous recevrez prochainement toutes les informations par email.</p>
+                </div>
+
+                <!-- Payment loading state will be dynamically created by JavaScript -->
+
+                <!-- Back Button -->
+                <div id="back-button-container" class="hidden">
+                    <button id="back-to-choice" class="back-btn">
+                        <span class="back-arrow">←</span>
+                        <span>Retour aux options</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal d'incitation Early Bird -->
+    <div id="upgrade-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎉 Pourquoi ne pas passer à Early Bird ?</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upgrade-benefits">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🎫</div>
+                        <div class="benefit-text">
+                            <strong>Économisez sur le prochain festival au Fort</strong>
+                            <p>Place gratuite d'une valeur de 15€</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🏢</div>
+                        <div class="benefit-text">
+                            <strong>Rejoignez la communauté ForNap</strong>
+                            <p>Accès exclusif à l'espace membres</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🎯</div>
+                        <div class="benefit-text">
+                            <strong>Programme fidélité exclusif</strong>
+                            <p>Avantages cumulables à vie</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-price">
+                    <span class="modal-price-text">Tout ça pour seulement <strong>12€</strong> !</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="upgrade-btn" onclick="upgradeToMember()">
+                    <span>Passer à Early Bird</span>
+                    <span class="upgrade-arrow">🚀</span>
+                </button>
+                <button class="stay-btn" onclick="continueAsInterested()">
+                    Rester sur gratuit
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyALz161yfiLaOeHU82DQNJV4PkzAXO1wzM",
+            authDomain: "nap-7aa80.firebaseapp.com",
+            projectId: "nap-7aa80",
+            storageBucket: "nap-7aa80.firebasestorage.app",
+            messagingSenderId: "434731738248",
+            appId: "1:434731738248:web:481644f3a6e809c06d2b3d",
+            measurementId: "G-3HVC6HNG02"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Expose Firebase functions globally
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+    </script>
+
+    <!-- HelloAsso API calls will be handled directly in JavaScript -->
+    
+    <!-- Main JavaScript -->
+    <script src="member-signup.js"></script>
+</body>
+</html> 
