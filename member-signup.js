@@ -2,38 +2,14 @@ class MemberSignup {
     constructor() {
         this.currentMode = null;
         this.currentFormData = null;
-        
-        // 🧪 MODE SANDBOX pour les tests (mettre isSandbox à false en production)
-        // ⚠️ ATTENTION: Mode sandbox a des problèmes d'authentification
-        // Basculez temporairement en production si les credentials sandbox ne marchent pas
-        this.isSandbox = false; // ⚠️ TEMPORAIRE: test en production avec montants réduits
-        
-        if (this.isSandbox) {
-            // ⚠️ CREDENTIALS SANDBOX À METTRE À JOUR
-            // Ces identifiants semblent invalides - vérifiez votre compte sandbox HelloAsso
-            this.helloAssoClientId = 'VOTRE_CLIENT_ID_SANDBOX_VALIDE';
-            this.helloAssoClientSecret = 'VOTRE_CLIENT_SECRET_SANDBOX_VALIDE';
-            this.organizationSlug = 'no-id-lab'; // Vérifiez que cette organisation existe en sandbox
-            this.baseUrl = 'https://api.helloasso-sandbox.com/v5';
-            this.oauthUrl = 'https://api.helloasso-sandbox.com/oauth2';
-        } else {
-            // Credentials Production
-            this.helloAssoClientId = 'b113d06d07884da39d0a6b52482b40bd';
-            this.helloAssoClientSecret = 'NMFwtSG1Bt63HkJ2Xn/vqarfTbUJBWsP';
-            this.organizationSlug = 'no-id-lab';
-            this.baseUrl = 'https://api.helloasso.com/v5';
-            this.oauthUrl = 'https://api.helloasso.com/oauth2';
-        }
-        
-        // Configuration du prix (en centimes)
-        this.membershipPrice = 100; // ⚠️ TEMPORAIRE: 1€ pour les tests en production
-        // this.membershipPrice = 1200; // 12€ pour l'adhésion Early Member (remettre après tests)
+        this.helloAssoClientId = 'b113d06d07884da39d0a6b52482b40bd';
+        this.helloAssoClientSecret = 'NMFwtSG1Bt63HkJ2Xn/vqarfTbUJBWsP';
+        this.organizationSlug = 'no-id-lab';
+        this.baseUrl = 'https://api.helloasso.com/v5';
+        this.oauthUrl = 'https://api.helloasso.com/oauth2';
         
         // URL de retour pour les tests locaux (à changer en production)
         this.testReturnUrl = 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
-        
-        console.log(`🔧 Mode ${this.isSandbox ? 'SANDBOX' : 'PRODUCTION'} activé`);
-        console.log(`💰 Prix adhésion: ${this.membershipPrice / 100}€`);
         
         this.init();
     }
@@ -41,7 +17,6 @@ class MemberSignup {
     init() {
         this.setupEventListeners();
         this.handleUrlParams(); // Pour gérer les retours de paiement
-        this.addSandboxIndicator(); // Afficher l'indicateur sandbox si nécessaire
     }
 
     setupEventListeners() {
@@ -221,7 +196,7 @@ class MemberSignup {
             zipcode: document.getElementById('member-zipcode').value,
             email: document.getElementById('member-email').value,
             phone: document.getElementById('member-phone').value,
-            amount: this.membershipPrice, // Prix configuré dans le constructeur
+            amount: 200, // 12€ en centimes
             timestamp: new Date().toISOString()
         };
 
@@ -327,11 +302,6 @@ class MemberSignup {
                 currentUrl: currentUrl
             });
 
-            console.log('📝 Création du checkout intent...');
-            console.log('URL API:', `${this.baseUrl}/organizations/${this.organizationSlug}/checkout-intents`);
-            console.log('Organization Slug:', this.organizationSlug);
-            console.log('Données checkout:', checkoutData);
-
             const response = await fetch(`${this.baseUrl}/organizations/${this.organizationSlug}/checkout-intents`, {
                 method: 'POST',
                 headers: {
@@ -341,21 +311,10 @@ class MemberSignup {
                 body: JSON.stringify(checkoutData)
             });
 
-            console.log('Statut création checkout:', response.status);
-
             if (!response.ok) {
                 const errorData = await response.text();
-                console.error('❌ Erreur API HelloAsso:', response.status, errorData);
-                
-                if (response.status === 403) {
-                    console.error('❌ Erreur 403 possible causes:');
-                    console.error('- Organisation "' + this.organizationSlug + '" n\'existe pas en sandbox');
-                    console.error('- Token d\'accès invalide ou expiré');
-                    console.error('- Permissions insuffisantes pour l\'application');
-                    console.error('- Compte sandbox mal configuré');
-                }
-                
-                throw new Error(`Erreur API: ${response.status} - ${errorData}`);
+                console.error('Erreur API HelloAsso:', response.status, errorData);
+                throw new Error(`Erreur API: ${response.status}`);
             }
 
             const result = await response.json();
@@ -371,11 +330,6 @@ class MemberSignup {
 
     async getAccessToken() {
         try {
-            console.log('🔐 Tentative d\'authentification HelloAsso...');
-            console.log('URL OAuth:', this.oauthUrl);
-            console.log('Client ID:', this.helloAssoClientId ? `${this.helloAssoClientId.substring(0, 8)}...` : 'NON DÉFINI');
-            console.log('Client Secret:', this.helloAssoClientSecret ? 'DÉFINI' : 'NON DÉFINI');
-            
             const response = await fetch(`${this.oauthUrl}/token`, {
                 method: 'POST',
                 headers: {
@@ -388,27 +342,17 @@ class MemberSignup {
                 })
             });
 
-            console.log('Statut authentification:', response.status);
-
             if (!response.ok) {
                 const errorData = await response.text();
-                console.error('❌ Erreur authentification HelloAsso:', response.status, errorData);
-                
-                if (response.status === 401) {
-                    throw new Error('Identifiants API invalides - Vérifiez vos Client ID/Secret sandbox');
-                } else if (response.status === 403) {
-                    throw new Error('Accès refusé - Vérifiez les permissions de votre application sandbox');
-                } else {
-                    throw new Error(`Erreur authentification: ${response.status} - ${errorData}`);
-                }
+                console.error('Erreur authentification HelloAsso:', response.status, errorData);
+                throw new Error(`Erreur authentification: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log('✅ Token d\'accès obtenu avec succès');
             return data.access_token;
             
         } catch (error) {
-            console.error('❌ Erreur lors de l\'obtention du token:', error);
+            console.error('Erreur lors de l\'obtention du token:', error);
             throw error;
         }
     }
@@ -564,32 +508,6 @@ class MemberSignup {
     validateZipCode(zipcode) {
         const zipcodeRegex = /^[0-9]{5}$/;
         return zipcodeRegex.test(zipcode);
-    }
-
-    addSandboxIndicator() {
-        if (this.isSandbox) {
-            const indicator = document.createElement('div');
-            indicator.id = 'sandbox-indicator';
-            indicator.innerHTML = `
-                <div style="
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    background: linear-gradient(45deg, #ff6b6b, #ff8e53);
-                    color: white;
-                    text-align: center;
-                    padding: 8px;
-                    font-weight: bold;
-                    font-size: 14px;
-                    z-index: 10000;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-                ">
-                    🧪 MODE TEST SANDBOX - Aucun paiement réel ne sera effectué
-                </div>
-            `;
-            document.body.prepend(indicator);
-        }
     }
 
     showError(message) {
