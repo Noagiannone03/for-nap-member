@@ -2,10 +2,7 @@ class MemberSignup {
     constructor() {
         this.currentMode = null;
         this.currentFormData = null;
-        this.currentMemberId = null;
-        this.memberData = null;
-        
-        // Configuration Production HelloAsso
+        this.memberDocumentId = null; // Stocker l'ID du document Firebase
         this.helloAssoClientId = 'b113d06d07884da39d0a6b52482b40bd';
         this.helloAssoClientSecret = 'NMFwtSG1Bt63HkJ2Xn/vqarfTbUJBWsP';
         this.organizationSlug = 'no-id-lab';
@@ -77,6 +74,14 @@ class MemberSignup {
         if (backBtn) {
             backBtn.addEventListener('click', () => {
                 this.backToChoice();
+            });
+        }
+
+        // Download member card button
+        const downloadBtn = document.getElementById('download-member-card');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                this.downloadMemberCard();
             });
         }
 
@@ -200,7 +205,7 @@ class MemberSignup {
             zipcode: document.getElementById('member-zipcode').value,
             email: document.getElementById('member-email').value,
             phone: document.getElementById('member-phone').value,
-            amount: 10, // 10 centimes pour test
+            amount: 10, // 0,10€ en centimes (pour test)
             timestamp: new Date().toISOString()
         };
 
@@ -424,22 +429,19 @@ class MemberSignup {
                 this.currentFormData.paymentStatus = 'completed';
                 this.currentFormData.sessionId = sessionId;
                 
-                // Sauvegarder en Firebase et récupérer l'ID
-                const memberId = await this.saveToFirebase('members', this.currentFormData);
-                this.currentMemberId = memberId;
+                // Sauvegarder en Firebase et récupérer l'ID du document
+                this.memberDocumentId = await this.saveToFirebase('members', this.currentFormData);
+                console.log('Membre sauvegardé avec ID:', this.memberDocumentId);
                 
-                // Sauvegarder une copie des données pour le PDF
-                this.memberData = { ...this.currentFormData };
-                
-                // Générer et afficher le QR code
-                await this.generateMemberQRCode(memberId);
                 this.currentFormData = null;
             }
             
-            // Afficher le succès avec QR code
+            // Afficher le succès
             this.hideAllForms();
             setTimeout(() => {
                 document.getElementById('success-member').classList.remove('hidden');
+                // Générer le QR code après l'affichage
+                this.generateMemberQRCode();
             }, 300);
 
         } catch (error) {
@@ -448,6 +450,9 @@ class MemberSignup {
             this.hideAllForms();
             setTimeout(() => {
                 document.getElementById('success-member').classList.remove('hidden');
+                // Générer un QR code avec session ID en fallback
+                this.memberDocumentId = sessionId || 'temp-' + Date.now();
+                this.generateMemberQRCode();
             }, 300);
         }
     }
@@ -502,6 +507,172 @@ class MemberSignup {
         this.showForm('member');
     }
 
+    async generateMemberQRCode() {
+        if (!this.memberDocumentId) {
+            console.error('Pas d\'ID de document pour générer le QR code');
+            return;
+        }
+
+        try {
+            const qrContainer = document.getElementById('member-qr-code');
+            if (!qrContainer) return;
+
+            // Afficher un état de chargement
+            qrContainer.innerHTML = `
+                <div class="qr-loading">
+                    <div class="qr-loading-spinner"></div>
+                    <span>Génération de votre QR code...</span>
+                </div>
+            `;
+
+            // Générer le QR code avec l'ID du document
+            const qrCodeData = `FORNAP-MEMBER:${this.memberDocumentId}`;
+            
+            // Créer le canvas pour le QR code
+            const canvas = document.createElement('canvas');
+            await QRCode.toCanvas(canvas, qrCodeData, {
+                width: 250,
+                margin: 2,
+                color: {
+                    dark: '#1a1a1a',
+                    light: '#ffffff'
+                }
+            });
+
+            // Remplacer le contenu de chargement par le QR code
+            qrContainer.innerHTML = '';
+            qrContainer.appendChild(canvas);
+
+            console.log('QR Code généré pour le membre:', this.memberDocumentId);
+
+        } catch (error) {
+            console.error('Erreur lors de la génération du QR code:', error);
+            const qrContainer = document.getElementById('member-qr-code');
+            if (qrContainer) {
+                qrContainer.innerHTML = `
+                    <p style="color: #ff6b6b;">Erreur lors de la génération du QR code</p>
+                `;
+            }
+        }
+    }
+
+    async downloadMemberCard() {
+        if (!this.memberDocumentId) {
+            this.showError('Erreur: Aucune donnée de membre disponible');
+            return;
+        }
+
+        try {
+            const downloadBtn = document.getElementById('download-member-card');
+            if (downloadBtn) {
+                downloadBtn.textContent = '📄 Génération en cours...';
+                downloadBtn.disabled = true;
+            }
+
+            // Créer le PDF
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('portrait', 'mm', 'a4');
+            
+            // Couleurs
+            const goldColor = [255, 215, 0];
+            const darkColor = [26, 26, 26];
+
+            // Background
+            pdf.setFillColor(darkColor[0], darkColor[1], darkColor[2]);
+            pdf.rect(0, 0, 210, 297, 'F');
+
+            // Titre
+            pdf.setTextColor(goldColor[0], goldColor[1], goldColor[2]);
+            pdf.setFontSize(28);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('CARTE MEMBRE', 105, 30, { align: 'center' });
+            
+            pdf.setFontSize(20);
+            pdf.text('ForNap - Early Member', 105, 45, { align: 'center' });
+
+            // Logo (si disponible)
+            try {
+                const logoImg = document.getElementById('logo-img');
+                if (logoImg && logoImg.src) {
+                    // Créer un canvas pour convertir l'image
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    
+                    await new Promise((resolve) => {
+                        img.onload = () => {
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx.drawImage(img, 0, 0);
+                            
+                            const logoData = canvas.toDataURL('image/png');
+                            pdf.addImage(logoData, 'PNG', 85, 55, 40, 40);
+                            resolve();
+                        };
+                        img.src = logoImg.src;
+                    });
+                }
+            } catch (logoError) {
+                console.log('Logo non disponible, continuons sans');
+            }
+
+            // QR Code (prend le maximum de place)
+            const qrCodeData = `FORNAP-MEMBER:${this.memberDocumentId}`;
+            
+            // Créer un grand QR code
+            const qrCanvas = document.createElement('canvas');
+            await QRCode.toCanvas(qrCanvas, qrCodeData, {
+                width: 600,
+                margin: 4,
+                color: {
+                    dark: '#1a1a1a',
+                    light: '#ffffff'
+                }
+            });
+
+            const qrDataUrl = qrCanvas.toDataURL('image/png');
+            
+            // Ajouter le QR code au centre de la page (grande taille)
+            const qrSize = 140; // Taille du QR code en mm
+            const qrX = (210 - qrSize) / 2; // Centrer horizontalement
+            const qrY = 110; // Position verticale
+            
+            pdf.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+
+            // Informations en bas
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(12);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('Scannez ce code pour accéder à vos avantages membres', 105, 270, { align: 'center' });
+            
+            pdf.setFontSize(10);
+            pdf.text(`ID Membre: ${this.memberDocumentId}`, 105, 280, { align: 'center' });
+            pdf.text(`Généré le: ${new Date().toLocaleDateString('fr-FR')}`, 105, 290, { align: 'center' });
+
+            // Télécharger le PDF
+            pdf.save(`ForNap-Carte-Membre-${this.memberDocumentId}.pdf`);
+
+            // Restaurer le bouton
+            if (downloadBtn) {
+                downloadBtn.textContent = '📄 Télécharger ma carte membre (PDF)';
+                downloadBtn.disabled = false;
+            }
+
+            console.log('Carte membre PDF générée avec succès');
+
+        } catch (error) {
+            console.error('Erreur lors de la génération du PDF:', error);
+            this.showError('Erreur lors de la génération de la carte membre');
+            
+            // Restaurer le bouton en cas d'erreur
+            const downloadBtn = document.getElementById('download-member-card');
+            if (downloadBtn) {
+                downloadBtn.textContent = '📄 Télécharger ma carte membre (PDF)';
+                downloadBtn.disabled = false;
+            }
+        }
+    }
+
     async saveToFirebase(collectionName, data) {
         try {
             const docRef = await addDoc(collection(db, collectionName), data);
@@ -540,152 +711,6 @@ class MemberSignup {
             errorElement.style.display = 'none';
         }, 5000);
     }
-
-    async generateMemberQRCode(memberId) {
-        try {
-            // Créer le QR code avec l'ID du membre
-            const qrContainer = document.getElementById('qr-code-container');
-            if (qrContainer) {
-                qrContainer.innerHTML = '<div class="qr-loading">Génération du QR code...</div>';
-                
-                // Générer le QR code
-                const qr = qrcode(0, 'M');
-                qr.addData(memberId);
-                qr.make();
-                
-                // Créer l'image du QR code
-                const qrImage = qr.createImgTag(4);
-                qrContainer.innerHTML = qrImage;
-                qrContainer.classList.add('loaded');
-                
-                // Mettre à jour l'ID membre affiché
-                const memberIdElement = document.getElementById('member-id-display');
-                if (memberIdElement) {
-                    memberIdElement.textContent = memberId;
-                }
-                
-                console.log('QR Code généré pour le membre:', memberId);
-            }
-        } catch (error) {
-            console.error('Erreur lors de la génération du QR code:', error);
-            const qrContainer = document.getElementById('qr-code-container');
-            if (qrContainer) {
-                qrContainer.innerHTML = '<div style="color: #ff6b6b;">Erreur de génération du QR code</div>';
-            }
-        }
-    }
-
-    async generateMembershipPDF() {
-        try {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Configuration
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            
-            // Récupérer le QR code
-            const qrContainer = document.querySelector('#qr-code-container img');
-            
-            if (qrContainer) {
-                // Convertir l'image QR en canvas puis en image pour le PDF
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const qrImg = new Image();
-                
-                qrImg.onload = () => {
-                    canvas.width = qrImg.width;
-                    canvas.height = qrImg.height;
-                    ctx.drawImage(qrImg, 0, 0);
-                    
-                    const qrData = canvas.toDataURL('image/png');
-                    
-                    // Tentative de chargement du logo ForNap
-                    const logoImg = new Image();
-                    logoImg.crossOrigin = 'anonymous';
-                    
-                    logoImg.onload = () => {
-                        // Ajouter le logo en haut
-                        const logoSize = 40;
-                        const logoX = (pageWidth - logoSize) / 2;
-                        
-                        const logoCanvas = document.createElement('canvas');
-                        const logoCtx = logoCanvas.getContext('2d');
-                        logoCanvas.width = logoImg.width;
-                        logoCanvas.height = logoImg.height;
-                        logoCtx.drawImage(logoImg, 0, 0);
-                        
-                        const logoData = logoCanvas.toDataURL('image/png');
-                        doc.addImage(logoData, 'PNG', logoX, 15, logoSize, logoSize);
-                        
-                        this.finalizePDF(doc, qrData, pageWidth, pageHeight);
-                    };
-                    
-                    logoImg.onerror = () => {
-                        // Si le logo ne charge pas, continuer sans logo
-                        console.log('Logo non trouvé, génération du PDF sans logo');
-                        this.finalizePDF(doc, qrData, pageWidth, pageHeight);
-                    };
-                    
-                    // Tenter de charger le logo
-                    logoImg.src = './logo.png';
-                };
-                
-                qrImg.src = qrContainer.src;
-            } else {
-                this.showError('QR code non trouvé');
-            }
-            
-        } catch (error) {
-            console.error('Erreur lors de la génération du PDF:', error);
-            this.showError('Erreur lors de la génération du PDF');
-        }
-    }
-
-    finalizePDF(doc, qrData, pageWidth, pageHeight) {
-        // Titre
-        doc.setFontSize(24);
-        doc.setFont(undefined, 'bold');
-        doc.text('ForNap - Carte de Membre', pageWidth / 2, 75, { align: 'center' });
-        
-        // Sous-titre
-        doc.setFontSize(16);
-        doc.setFont(undefined, 'normal');
-        doc.text('Early Member', pageWidth / 2, 90, { align: 'center' });
-        
-        // Informations membre
-        if (this.memberData && this.currentMemberId) {
-            doc.setFontSize(12);
-            doc.text(`Nom: ${this.memberData.firstname} ${this.memberData.lastname}`, 20, 115);
-            doc.text(`Email: ${this.memberData.email}`, 20, 130);
-            doc.text(`ID Membre: ${this.currentMemberId}`, 20, 145);
-            doc.text(`Date d'adhésion: ${new Date().toLocaleDateString('fr-FR')}`, 20, 160);
-        }
-        
-        // QR Code (plus grand et centré)
-        const qrSize = 80;
-        const qrX = (pageWidth - qrSize) / 2;
-        const qrY = 180;
-        
-        doc.addImage(qrData, 'PNG', qrX, qrY, qrSize, qrSize);
-        
-        // Instructions
-        doc.setFontSize(11);
-        doc.setFont(undefined, 'bold');
-        doc.text('Présentez ce QR code lors de vos visites au ForNap', pageWidth / 2, qrY + qrSize + 20, { align: 'center' });
-        
-        // Footer
-        doc.setFontSize(8);
-        doc.setFont(undefined, 'normal');
-        doc.text('Généré automatiquement - ForNap Tiers Lieu Culturel', pageWidth / 2, pageHeight - 15, { align: 'center' });
-        doc.text(`ID: ${this.currentMemberId}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
-        
-        // Télécharger le PDF
-        const filename = `ForNap-Carte-Membre-${this.currentMemberId || 'temp'}.pdf`;
-        doc.save(filename);
-        
-        console.log('PDF généré:', filename);
-    }
 }
 
 // Initialize the app when DOM is loaded
@@ -703,12 +728,6 @@ window.continueAsInterested = function() {
 window.upgradeToMember = function() {
     if (window.memberSignupInstance) {
         window.memberSignupInstance.upgradeToMember();
-    }
-};
-
-window.downloadMembershipPDF = function() {
-    if (window.memberSignupInstance) {
-        window.memberSignupInstance.generateMembershipPDF();
     }
 };
 

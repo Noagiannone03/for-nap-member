@@ -57,7 +57,7 @@
                             <h3>Je veux faire partie du projet</h3>
                             <div class="card-price">
                                 <span class="price-amount">0,10€</span>
-                                <span class="price-period">test production</span>
+                                <span class="price-period">pour 1 an (test)</span>
                             </div>
                         </div>
                         <div class="card-content">
@@ -137,7 +137,7 @@
                         </div>
                         <div class="price-info">
                             <span class="price">0,10€</span>
-                            <span class="price-description">Test Production</span>
+                            <span class="price-description">Adhésion Early Member (Test)</span>
                         </div>
                         <button type="submit" class="submit-btn member-btn">Devenir Early Member</button>
                     </form>
@@ -156,24 +156,21 @@
                     <div class="success-animation">
                         <div class="celebration">🎊</div>
                     </div>
-                    <h2>Bienvenue dans la Team !</h2>
-                    <p>Félicitations ! Vous êtes maintenant Early Member de notre tiers lieu culturel.</p>
+                    <h2>Félicitations ! Vous êtes désormais membre ForNap</h2>
+                    <p>Votre adhésion Early Member a été validée avec succès.</p>
                     
                     <!-- QR Code Section -->
-                    <div class="member-card">
-                        <h3>🎫 Votre Carte de Membre</h3>
-                        <div id="qr-code-container" class="qr-code-display">
-                            <!-- QR code will be generated here -->
-                        </div>
-                        <p class="member-id">ID Membre: <span id="member-id-display">...</span></p>
-                        <p class="qr-instructions">Présentez ce QR code lors de vos visites au ForNap</p>
+                    <div class="member-card-section">
+                        <h3>🎫 Votre carte de membre</h3>
+                        <div id="member-qr-code" class="qr-code-container"></div>
+                        <p class="qr-info">Scannez ce code pour accéder à vos avantages membres</p>
                         
-                        <button onclick="downloadMembershipPDF()" class="download-pdf-btn">
-                            📄 Télécharger ma carte PDF
+                        <button id="download-member-card" class="download-btn">
+                            📄 Télécharger ma carte membre (PDF)
                         </button>
                     </div>
                     
-                    <p>Vous recevrez prochainement toutes les informations par email.</p>
+                    <p class="email-info">Vous recevrez également toutes les informations par email.</p>
                 </div>
 
                 <!-- Payment loading state will be dynamically created by JavaScript -->
@@ -261,9 +258,9 @@
     </script>
 
     <!-- QR Code Library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     
-    <!-- PDF Generation Library -->
+    <!-- jsPDF Library for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <!-- Main JavaScript -->
