@@ -347,6 +347,15 @@
                     const qrContainer = document.getElementById('member-qr-code');
                     if (!qrContainer) return;
 
+                    // Vérifier si QRCode est disponible
+                    if (typeof QRCode === 'undefined') {
+                        console.error('QRCode library not loaded');
+                        qrContainer.innerHTML = `<p style="color: #ff6b6b;">Chargement des librairies...</p>`;
+                        // Attendre un peu et réessayer
+                        setTimeout(() => this.generateMemberQRCode(), 1000);
+                        return;
+                    }
+
                     const qrCodeData = `FORNAP-MEMBER:${this.memberDocumentId}`;
                     
                     const canvas = document.createElement('canvas');
@@ -379,6 +388,16 @@
                     if (downloadBtn) {
                         downloadBtn.textContent = '📄 Génération en cours...';
                         downloadBtn.disabled = true;
+                    }
+
+                    // Vérifier si les librairies sont disponibles
+                    if (typeof QRCode === 'undefined' || typeof window.jspdf === 'undefined') {
+                        alert('Librairies en cours de chargement. Veuillez attendre et réessayer.');
+                        if (downloadBtn) {
+                            downloadBtn.textContent = '📄 Télécharger ma carte membre (PDF)';
+                            downloadBtn.disabled = false;
+                        }
+                        return;
                     }
 
                     const { jsPDF } = window.jspdf;
@@ -457,9 +476,29 @@
             }
         }
 
-        // Initialiser la page
+        // Fonction pour attendre que les librairies soient chargées
+        function waitForLibraries(callback, maxAttempts = 50) {
+            let attempts = 0;
+            const checkInterval = setInterval(() => {
+                attempts++;
+                if (typeof QRCode !== 'undefined' && typeof window.jspdf !== 'undefined') {
+                    clearInterval(checkInterval);
+                    console.log('Librairies chargées avec succès');
+                    callback();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    console.error('Impossible de charger les librairies QRCode et jsPDF');
+                    // Essayer d'initialiser quand même
+                    callback();
+                }
+            }, 100);
+        }
+
+        // Initialiser la page quand les librairies sont prêtes
         document.addEventListener('DOMContentLoaded', () => {
-            new SuccessPage();
+            waitForLibraries(() => {
+                new SuccessPage();
+            });
         });
     </script>
 </body>
