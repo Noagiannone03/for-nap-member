@@ -2,14 +2,34 @@ class MemberSignup {
     constructor() {
         this.currentMode = null;
         this.currentFormData = null;
-        this.helloAssoClientId = 'b113d06d07884da39d0a6b52482b40bd';
-        this.helloAssoClientSecret = 'NMFwtSG1Bt63HkJ2Xn/vqarfTbUJBWsP';
-        this.organizationSlug = 'no-id-lab';
-        this.baseUrl = 'https://api.helloasso.com/v5';
-        this.oauthUrl = 'https://api.helloasso.com/oauth2';
+        
+        // 🧪 MODE SANDBOX pour les tests (mettre isSandbox à false en production)
+        this.isSandbox = true;
+        
+        if (this.isSandbox) {
+            // Credentials Sandbox
+            this.helloAssoClientId = '28eba7759dce4f0aaeb80b1e7e264f72';
+            this.helloAssoClientSecret = 'qWWRz7Dcbsi1nMxzCL8jHpRSlEXrvu0g';
+            this.organizationSlug = 'no-id-lab'; // À vérifier sur sandbox
+            this.baseUrl = 'https://api.helloasso-sandbox.com/v5';
+            this.oauthUrl = 'https://api.helloasso-sandbox.com/oauth2';
+        } else {
+            // Credentials Production
+            this.helloAssoClientId = 'b113d06d07884da39d0a6b52482b40bd';
+            this.helloAssoClientSecret = 'NMFwtSG1Bt63HkJ2Xn/vqarfTbUJBWsP';
+            this.organizationSlug = 'no-id-lab';
+            this.baseUrl = 'https://api.helloasso.com/v5';
+            this.oauthUrl = 'https://api.helloasso.com/oauth2';
+        }
+        
+        // Configuration du prix (en centimes)
+        this.membershipPrice = 1200; // 12€ pour l'adhésion Early Member
         
         // URL de retour pour les tests locaux (à changer en production)
         this.testReturnUrl = 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
+        
+        console.log(`🔧 Mode ${this.isSandbox ? 'SANDBOX' : 'PRODUCTION'} activé`);
+        console.log(`💰 Prix adhésion: ${this.membershipPrice / 100}€`);
         
         this.init();
     }
@@ -17,6 +37,7 @@ class MemberSignup {
     init() {
         this.setupEventListeners();
         this.handleUrlParams(); // Pour gérer les retours de paiement
+        this.addSandboxIndicator(); // Afficher l'indicateur sandbox si nécessaire
     }
 
     setupEventListeners() {
@@ -196,7 +217,7 @@ class MemberSignup {
             zipcode: document.getElementById('member-zipcode').value,
             email: document.getElementById('member-email').value,
             phone: document.getElementById('member-phone').value,
-            amount: 1200, // 12€ en centimes
+            amount: this.membershipPrice, // Prix configuré dans le constructeur
             timestamp: new Date().toISOString()
         };
 
@@ -508,6 +529,32 @@ class MemberSignup {
     validateZipCode(zipcode) {
         const zipcodeRegex = /^[0-9]{5}$/;
         return zipcodeRegex.test(zipcode);
+    }
+
+    addSandboxIndicator() {
+        if (this.isSandbox) {
+            const indicator = document.createElement('div');
+            indicator.id = 'sandbox-indicator';
+            indicator.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+                    color: white;
+                    text-align: center;
+                    padding: 8px;
+                    font-weight: bold;
+                    font-size: 14px;
+                    z-index: 10000;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                ">
+                    🧪 MODE TEST SANDBOX - Aucun paiement réel ne sera effectué
+                </div>
+            `;
+            document.body.prepend(indicator);
+        }
     }
 
     showError(message) {
