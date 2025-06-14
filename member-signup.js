@@ -21,35 +21,25 @@ class MemberSignup {
     }
 
     setupEventListeners() {
-        // Choice cards
-        const choiceCards = document.querySelectorAll('.choice-card');
-        choiceCards.forEach(card => {
-            card.addEventListener('click', (e) => {
-                // Don't trigger if clicking on a button
-                if (e.target.closest('.choice-btn')) return;
-                
-                const option = card.dataset.option;
-                this.handleChoiceSelection(option);
-            });
-        });
+        // Boutons de l'interface d'accueil
+        const interestButton = document.querySelector('.interest-button');
+        const membershipButton = document.querySelector('.membership-button');
 
-        // Choice buttons
-        const interestedBtn = document.querySelector('.interested-btn');
-        const memberBtn = document.querySelector('.member-btn');
-
-        if (interestedBtn) {
-            interestedBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
+        if (interestButton) {
+            interestButton.addEventListener('click', (e) => {
+                e.preventDefault();
                 this.handleChoiceSelection('interested');
             });
         }
 
-        if (memberBtn) {
-            memberBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
+        if (membershipButton) {
+            membershipButton.addEventListener('click', (e) => {
+                e.preventDefault();
                 this.handleChoiceSelection('member');
             });
         }
+
+        // Les anciens sélecteurs ne sont plus nécessaires car remplacés par les nouveaux boutons
 
         // Forms
         const interestedForm = document.getElementById('interested-signup');
@@ -84,36 +74,24 @@ class MemberSignup {
                 this.downloadMemberCard();
             });
         }
-
-        // Modal close buttons
-        const modalClose = document.querySelector('.modal-close');
-        if (modalClose) {
-            modalClose.addEventListener('click', () => {
-                this.closeUpgradeModal();
-            });
-        }
-
-        // Close modal when clicking outside
-        const modal = document.getElementById('upgrade-modal');
-        if (modal) {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    this.closeUpgradeModal();
-                }
-            });
-        }
     }
 
     handleChoiceSelection(mode) {
         this.currentMode = mode;
         
         if (mode === 'interested') {
-            // Afficher la modal d'incitation avant de continuer
-            this.showUpgradeModal();
+            // Rediriger directement vers la phase de contact
+            this.showContactFormPhase();
             return;
         }
         
-        // Pour le mode member, continuer normalement
+        if (mode === 'member') {
+            // Activer la nouvelle phase du formulaire d'adhésion
+            this.showAdhesionFormPhase();
+            return;
+        }
+        
+        // Pour les autres modes, continuer normalement
         this.showForm(mode);
     }
 
@@ -288,29 +266,27 @@ class MemberSignup {
             console.log('Membre pré-enregistré avec ID:', memberDocId);
 
             const checkoutData = {
-                totalAmount: formData.amount,
-                initialAmount: formData.amount,
-                itemName: 'Adhésion Early Member - ForNap',
-                backUrl: baseReturnUrl + '?status=cancelled&memberid=' + memberDocId,
-                errorUrl: baseReturnUrl + '?status=error&memberid=' + memberDocId, 
-                returnUrl: baseReturnUrl + '?status=success&memberid=' + memberDocId,
+                totalAmount: 1200, // 12€ en centimes
+                checkoutDescription: `Adhésion Early Member ForNap - ${formData.firstname} ${formData.lastname}`,
+                returnUrl: this.testReturnUrl,
                 containsDonation: false,
                 payer: {
                     firstName: formData.firstname,
                     lastName: formData.lastname,
                     email: formData.email,
-                    address: '',
-                    city: '',
+                    dateOfBirth: formData.birthdate,
+                    address: {
                     zipCode: formData.zipcode,
-                    country: 'FRA'
+                        country: "FRA"
+                    }
                 },
-                metadata: {
-                    userId: formData.email,
-                    membershipType: 'early-member',
-                    age: formData.age.toString(),
-                    phone: formData.phone,
-                    memberDocumentId: memberDocId
-                }
+                items: [{
+                    name: "Adhésion Early Member ForNap 2025",
+                    priceCategory: "Fixed",
+                    amount: 1200, // 12€ en centimes
+                    type: "Payment",
+                    description: "Adhésion Early Member jusqu'à fin 2025 + place festival offerte (valeur 15€)"
+                }]
             };
 
             console.log('URLs de retour configurées:', {
@@ -486,29 +462,7 @@ class MemberSignup {
         }
     }
 
-    // Modal upgrade functionality
-    showUpgradeModal() {
-        const modal = document.getElementById('upgrade-modal');
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
 
-    closeUpgradeModal() {
-        const modal = document.getElementById('upgrade-modal');
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-
-    continueAsInterested() {
-        this.closeUpgradeModal();
-        this.showForm('interested');
-    }
-
-    upgradeToMember() {
-        this.closeUpgradeModal();
-        this.currentMode = 'member';
-        this.showForm('member');
-    }
 
     async generateMemberQRCode() {
         if (!this.memberDocumentId) {
@@ -577,7 +531,8 @@ class MemberSignup {
             const pdf = new jsPDF('portrait', 'mm', 'a4');
             
             // Couleurs
-            const goldColor = [255, 215, 0];
+            const primaryColor = [32, 178, 170]; // Cyan #20B2AA
+            const secondaryColor = [23, 162, 184]; // Bleu #17A2B8
             const darkColor = [26, 26, 26];
 
             // Background
@@ -585,7 +540,7 @@ class MemberSignup {
             pdf.rect(0, 0, 210, 297, 'F');
 
             // Titre
-            pdf.setTextColor(goldColor[0], goldColor[1], goldColor[2]);
+            pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
             pdf.setFontSize(28);
             pdf.setFont('helvetica', 'bold');
             pdf.text('CARTE MEMBRE', 105, 30, { align: 'center' });
@@ -593,8 +548,8 @@ class MemberSignup {
             pdf.setFontSize(20);
             pdf.text('ForNap - Early Member', 105, 45, { align: 'center' });
 
-            // Logo ForNap (texte stylisé en or)
-            pdf.setTextColor(goldColor[0], goldColor[1], goldColor[2]);
+            // Logo ForNap (texte stylisé en cyan)
+            pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
             pdf.setFontSize(16);
             pdf.setFont('helvetica', 'bold');
             pdf.text('🔥 ForNap', 105, 70, { align: 'center' });
@@ -635,6 +590,49 @@ class MemberSignup {
             pdf.setFontSize(10);
             pdf.text(`ID Membre: ${this.memberDocumentId}`, 105, 280, { align: 'center' });
             pdf.text(`Généré le: ${new Date().toLocaleDateString('fr-FR')}`, 105, 290, { align: 'center' });
+
+            // Statut Early Member (avec rectangle cyan)
+            pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            pdf.roundedRect(20, 100, 170, 20, 3, 3, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(14);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('🔥 EARLY MEMBER STATUS', 105, 113, { align: 'center' });
+
+            // Informations membre
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(14);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('Membre:', 30, 150);
+            pdf.text('Email:', 30, 170);
+            pdf.text('Téléphone:', 30, 190);
+            pdf.text('Adhésion:', 30, 210);
+            pdf.text('Statut:', 30, 230);
+
+            // Valeurs
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(`${memberData.firstname} ${memberData.lastname}`, 75, 150);
+            pdf.text(memberData.email, 75, 170);
+            pdf.text(memberData.phone, 75, 190);
+            pdf.text('Jusqu\'à fin 2025', 75, 210);
+            pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            pdf.text('ACTIF', 75, 230);
+
+            // Avantages
+            pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            pdf.setFontSize(16);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('Vos avantages Early Member:', 30, 260);
+
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(12);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('• Place festival gratuite (valeur 15€)', 35, 275);
+            pdf.text('• Accès exclusif ForNap', 35, 285);
+            pdf.text('• Droit de vote sur les décisions', 35, 295);
+            pdf.text('• Programme fidélité exclusif', 35, 305);
+            pdf.text('• Statut d\'Early Member à vie', 35, 315);
 
             // Télécharger le PDF
             pdf.save(`ForNap-Carte-Membre-${this.memberDocumentId}.pdf`);
@@ -698,27 +696,173 @@ class MemberSignup {
             errorElement.style.display = 'none';
         }, 5000);
     }
+
+    showAdhesionFormPhase() {
+        // Ajouter la classe pour masquer le contenu principal
+        document.body.classList.add('adhesion-phase-active');
+        
+        // Afficher la phase d'adhésion avec animation
+        const adhesionPhase = document.getElementById('adhesion-form-phase');
+        adhesionPhase.classList.add('active');
+        
+        // Configurer l'événement de soumission du formulaire d'adhésion
+        const adhesionForm = document.getElementById('adhesion-signup-form');
+        if (adhesionForm && !adhesionForm.hasAttribute('data-listener-added')) {
+            adhesionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleAdhesionSubmit();
+            });
+            adhesionForm.setAttribute('data-listener-added', 'true');
+        }
+    }
+
+    showContactFormPhase() {
+        // Ajouter la classe pour masquer le contenu principal
+        document.body.classList.add('contact-phase-active');
+        
+        // Afficher la phase de contact avec animation
+        const contactPhase = document.getElementById('contact-form-phase');
+        contactPhase.classList.add('active');
+        
+        // Configurer l'événement de soumission du formulaire de contact
+        const contactForm = document.getElementById('contact-signup-form');
+        if (contactForm && !contactForm.hasAttribute('data-listener-added')) {
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleContactSubmit();
+            });
+            contactForm.setAttribute('data-listener-added', 'true');
+        }
+    }
+
+    // Fonction pour calculer l'âge à partir de la date de naissance
+    calculateAge(birthdate) {
+        const today = new Date();
+        const birth = new Date(birthdate);
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+        
+        return age;
+    }
+
+    async handleAdhesionSubmit() {
+        const form = document.getElementById('adhesion-signup-form');
+        const formData = new FormData(form);
+        
+        const birthdate = formData.get('birthdate');
+        const age = this.calculateAge(birthdate);
+        
+        const memberData = {
+            type: 'member',
+            lastname: formData.get('lastname'),
+            firstname: formData.get('firstname'),
+            birthdate: birthdate,
+            age: age, // Ajouter l'âge calculé
+            zipcode: formData.get('zipcode'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            timestamp: new Date().toISOString()
+        };
+
+        try {
+            // Validation
+            if (!this.validateEmail(memberData.email)) {
+                this.showError('Veuillez saisir un email valide');
+                return;
+            }
+
+            if (!this.validateZipCode(memberData.zipcode)) {
+                this.showError('Veuillez saisir un code postal valide (5 chiffres)');
+                return;
+            }
+
+            if (age < 16) {
+                this.showError('Vous devez avoir au moins 16 ans pour adhérer');
+                return;
+            }
+
+            // Sauvegarder les données temporairement
+            this.currentFormData = memberData;
+            
+            // Initialiser le paiement HelloAsso
+            await this.initializeHelloAssoPayment(memberData);
+
+        } catch (error) {
+            console.error('Erreur lors de l\'inscription:', error);
+            this.showError('Une erreur est survenue. Veuillez réessayer.');
+        }
+    }
+
+    async handleContactSubmit() {
+        const form = document.getElementById('contact-signup-form');
+        const formData = new FormData(form);
+        
+        const contactData = {
+            type: 'interested',
+            firstname: formData.get('firstname'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            timestamp: new Date().toISOString()
+        };
+
+        try {
+            // Validation
+            if (!this.validateEmail(contactData.email)) {
+                this.showError('Veuillez saisir un email valide');
+                return;
+            }
+
+            // Sauvegarde en base
+            await this.saveToFirebase('interested_users', contactData);
+            
+            // Afficher l'écran de succès stylé
+            this.showContactSuccessPhase();
+
+        } catch (error) {
+            console.error('Erreur lors de l\'inscription:', error);
+            this.showError('Une erreur est survenue. Veuillez réessayer.');
+        }
+    }
+
+    showContactSuccessPhase() {
+        // Masquer la phase de contact
+        document.body.classList.remove('contact-phase-active');
+        const contactPhase = document.getElementById('contact-form-phase');
+        contactPhase.classList.remove('active');
+        
+        // Afficher la phase de succès
+        document.body.classList.add('success-phase-active');
+        const successPhase = document.getElementById('contact-success-phase');
+        successPhase.classList.add('active');
+    }
+
+    // Fonction pour revenir au choix depuis n'importe quelle phase
+    goBackToChoice() {
+        // Nettoyer toutes les phases actives
+        document.body.classList.remove('adhesion-phase-active', 'contact-phase-active', 'success-phase-active');
+        
+        const adhesionPhase = document.getElementById('adhesion-form-phase');
+        const contactPhase = document.getElementById('contact-form-phase');
+        const successPhase = document.getElementById('contact-success-phase');
+        
+        if (adhesionPhase) adhesionPhase.classList.remove('active');
+        if (contactPhase) contactPhase.classList.remove('active');
+        if (successPhase) successPhase.classList.remove('active');
+        
+        // Plus besoin de clear selection car les nouveaux boutons n'ont pas d'état sélectionné
+        
+        this.currentMode = null;
+    }
 }
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new MemberSignup();
-});
-
-// Expose methods for modal buttons
-window.continueAsInterested = function() {
-    if (window.memberSignupInstance) {
-        window.memberSignupInstance.continueAsInterested();
-    }
-};
-
-window.upgradeToMember = function() {
-    if (window.memberSignupInstance) {
-        window.memberSignupInstance.upgradeToMember();
-    }
-};
-
-// Store instance globally for modal access
-document.addEventListener('DOMContentLoaded', () => {
     window.memberSignupInstance = new MemberSignup();
+    
+    // Expose methods for navigation
+    window.goBackToChoice = () => window.memberSignupInstance.goBackToChoice();
 }); 

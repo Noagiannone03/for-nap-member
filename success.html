@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #20B2AA 0%, #17A2B8 100%);
             color: #ffffff;
             min-height: 100vh;
             display: flex;
@@ -26,66 +26,69 @@
         .success-container {
             max-width: 600px;
             width: 100%;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
         }
 
         .celebration-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
+            font-size: 100px;
+            margin-bottom: 30px;
+            animation: celebrationBounce 2s infinite;
         }
 
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
+        @keyframes celebrationBounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(0deg); }
+            40% { transform: translateY(-15px) rotate(-5deg); }
+            60% { transform: translateY(-8px) rotate(5deg); }
         }
 
         .success-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #FFFFFF;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            line-height: 1.2;
         }
 
         .success-subtitle {
-            font-size: 18px;
-            color: #b0b0b0;
-            margin-bottom: 30px;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
             line-height: 1.6;
+            font-weight: 500;
         }
 
         .member-card-section {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 35px;
+            margin: 40px 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .card-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #ff8e8e;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #FFFFFF;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .qr-code-container {
             background: #ffffff;
-            border-radius: 15px;
+            border-radius: 16px;
             padding: 20px;
             margin: 20px auto;
             display: inline-block;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.8);
         }
 
         .qr-loading {
@@ -100,8 +103,8 @@
         .qr-loading-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #ff6b6b;
+            border: 3px solid rgba(32, 178, 170, 0.3);
+            border-top: 3px solid #20B2AA;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -113,26 +116,28 @@
 
         .qr-info {
             font-size: 14px;
-            color: #b0b0b0;
+            color: rgba(255, 255, 255, 0.8);
             margin-top: 15px;
         }
 
         .download-btn {
-            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            background: linear-gradient(135deg, #20B2AA 0%, #17A2B8 100%);
             color: #ffffff;
             border: none;
-            padding: 15px 30px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
+            padding: 16px 32px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 20px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            margin-top: 25px;
+            box-shadow: 0 8px 25px rgba(32, 178, 170, 0.3);
         }
 
         .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(32, 178, 170, 0.4);
+            background: linear-gradient(135deg, #17A2B8 0%, #20B2AA 100%);
         }
 
         .download-btn:disabled {
@@ -143,62 +148,74 @@
 
         .benefits-list {
             text-align: left;
-            margin: 25px 0;
+            margin: 30px 0;
         }
 
         .benefit-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin: 12px 0;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 8px;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .benefit-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
         }
 
         .benefit-icon {
-            font-size: 20px;
+            font-size: 24px;
+            flex-shrink: 0;
         }
 
         .benefit-text {
-            color: #e0e0e0;
-            font-size: 14px;
+            color: #FFFFFF;
+            font-size: 15px;
+            font-weight: 500;
         }
 
         .back-home-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.2);
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 25px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 30px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
         }
 
         .back-home-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         .member-id {
             font-family: 'Courier New', monospace;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 12px;
-            color: #ff8e8e;
-            margin-top: 20px;
-            border: 1px solid rgba(255, 142, 142, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #FFFFFF;
+            margin-top: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
         }
 
         .email-info {
-            font-size: 14px;
-            color: #b0b0b0;
-            margin-top: 25px;
-            font-style: italic;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 30px;
+            font-weight: 500;
         }
     </style>
 </head>

@@ -6,230 +6,146 @@
     <title>Tiers Lieu Culturel - Inscription</title>
     <link rel="stylesheet" href="member-signup.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Ionicons pour les icônes -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Header avec logo -->
-        <header class="header">
-            <div class="logo">
-                <img src="logo.svg" alt="Logo Tiers Lieu" id="logo-img">
-            </div>
-        </header>
-
-        <!-- Section principale -->
+        <!-- Interface d'accueil reproduction exacte de l'image -->
         <main class="main-content">
             <div class="content-wrapper">
-                <h1 class="title">Un Nouveau Tiers Lieu Culturel Arrive Bientôt</h1>
-                <p class="description">
-                    Soyez parmi les premiers à découvrir notre espace culturel innovant. 
-                    Un lieu de rencontre, de création et d'échange qui ouvrira ses portes très prochainement.
-                    Rejoignez-nous dès maintenant !
-                </p>
-
-                <!-- Choice Cards -->
-                <div class="choice-container">
-                    <div class="choice-card interested-card" data-option="interested">
-                        <div class="card-header">
-                            <div class="card-icon">📧</div>
-                            <h3>Je suis intéressé(e)</h3>
-                            <div class="card-badge">Gratuit</div>
-                        </div>
-                        <div class="card-content">
-                            <p>Restez informé(e) de l'ouverture et des premiers événements</p>
-                            <ul class="simple-benefits">
-                                <li>Newsletter exclusive du Fort</li>
-                                <li>Informations en avant-première</li>
-                                <li>Invitations aux prochains événements</li>
-                            </ul>
-                        </div>
-                        <div class="card-action">
-                            <button class="choice-btn interested-btn">
-                                <span>M'inscrire gratuitement</span>
-                                <div class="btn-arrow">→</div>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="choice-card member-card premium" data-option="member">
-                        <div class="premium-badge">🔥 EARLY BIRD</div>
-                        <div class="card-header">
-                            <div class="card-icon">⭐</div>
-                            <h3>Je veux faire partie du projet</h3>
-                            <div class="card-price">
-                                <span class="price-amount">0,55€</span>
-                                <span class="price-period">pour 1 an (test)</span>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <p><strong>Devenez Early Member</strong> et profitez d'avantages exclusifs !</p>
-                            <ul class="premium-benefits">
-                                <li class="highlight">🎫 <strong>Place festival au Fort</strong> à venir... (valeur 15€)</li>
-                                <li>🏢 <strong>Accès exclusif au ForNap</strong> (espace membres)</li>
-                                <li>🗳️ Droit de vote pour les décisions du Fort</li>
-                                <li>🎯 Programme fidélité exclusif</li>
-                                <li>🏆 Statut d'Early Member</li>
-                            </ul>
-                            <div class="value-highlight">
-                                <span class="value-text">Valeur totale : <strong>50€+</strong></span>
-                                <span class="savings">Accès 1 an pour 0,55€ seulement !</span>
-                            </div>
-                        </div>
-                        <div class="card-action">
-                            <button class="choice-btn member-btn premium-btn">
-                                <span>Devenir Early Member</span>
-                                <div class="btn-arrow">🚀</div>
-                            </button>
-                        </div>
-                    </div>
+                <!-- Logo ForNapa en haut -->
+                <div class="logo-section">
+                    <img src="logo.png" alt="ForNapa" class="fornapa-logo">
                 </div>
 
-                <!-- Formulaire Intéressé -->
-                <div id="interested-form" class="form-container hidden">
-                    <h2>Restez informé(e)</h2>
-                    <form id="interested-signup">
-                        <div class="input-group">
-                            <input type="text" id="interested-firstname" placeholder="Prénom" required>
-                        </div>
-                        <div class="input-group">
-                            <input type="email" id="interested-email" placeholder="Email" required>
-                        </div>
-                        <div class="input-group">
-                            <input type="tel" id="interested-phone" placeholder="Téléphone" required>
-                        </div>
-                        <button type="submit" class="submit-btn">M'inscrire aux updates</button>
-                    </form>
-                </div>
-
-                <!-- Formulaire Membre -->
-                <div id="member-form" class="form-container hidden">
-                    <h2>Devenir Early Member</h2>
-                    <div class="member-benefits">
-                        <h4>Avantages Early Member :</h4>
-                        <ul>
-                            <li>Accès prioritaire aux événements</li>
-                            <li>Tarifs préférentiels</li>
-                            <li>Participation aux décisions communautaires</li>
-                            <li>Espace de travail dédié</li>
-                        </ul>
-                    </div>
-                    <form id="member-signup">
-                        <div class="form-row">
-                            <div class="input-group">
-                                <input type="text" id="member-lastname" placeholder="Nom" required>
-                            </div>
-                            <div class="input-group">
-                                <input type="text" id="member-firstname" placeholder="Prénom" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="input-group">
-                                <input type="number" id="member-age" placeholder="Âge" min="16" max="99" required>
-                            </div>
-                            <div class="input-group">
-                                <input type="text" id="member-zipcode" placeholder="Code postal" pattern="[0-9]{5}" required>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <input type="email" id="member-email" placeholder="Email" required>
-                        </div>
-                        <div class="input-group">
-                            <input type="tel" id="member-phone" placeholder="Numéro de téléphone" required>
-                        </div>
-                        <div class="price-info">
-                            <span class="price">0,55€</span>
-                            <span class="price-description">Adhésion Early Member (Test)</span>
-                        </div>
-                        <button type="submit" class="submit-btn member-btn">Devenir Early Member</button>
-                    </form>
-                </div>
-
-                <!-- Success Messages -->
-                <div id="success-interested" class="success-message hidden">
-                    <div class="success-animation">
-                        <div class="checkmark">✓</div>
-                    </div>
-                    <h2>Merci !</h2>
-                    <p>Nous vous tiendrons informé(e) de l'ouverture du tiers lieu. Stay tuned ! 🎉</p>
-                </div>
-
-                <div id="success-member" class="success-message hidden">
-                    <div class="success-animation">
-                        <div class="celebration">🎊</div>
-                    </div>
-                    <h2>Félicitations ! Vous êtes désormais membre ForNap</h2>
-                    <p>Votre adhésion Early Member a été validée avec succès.</p>
+                <!-- Texte principal exact de l'image -->
+                <div class="main-text">
+                    <h1 class="subtitle-text">un nouveau tiers lieu<br>culturel et créatif</h1>
                     
-                    <!-- QR Code Section -->
-                    <div class="member-card-section">
-                        <h3>🎫 Votre carte de membre</h3>
-                        <div id="member-qr-code" class="qr-code-container"></div>
-                        <p class="qr-info">Scannez ce code pour accéder à vos avantages membres</p>
-                        
-                        <button id="download-member-card" class="download-btn">
-                            📄 Télécharger ma carte membre (PDF)
-                        </button>
+                    <div class="description-text">
+                        <p><strong>avec</strong></p>
+                        <p><strong>des événements trop cool</strong></p>
+                        <p><strong>des lieux de coworking</strong></p>
+                        <p><strong>des ateliers pour produire</strong></p>
+                        <p><strong>un bar, un café, un snack</strong></p>
+                        <p><strong>et tant de choses encore...</strong></p>
                     </div>
                     
-                    <p class="email-info">Vous recevrez également toutes les informations par email.</p>
+                    <h2 class="opening-text"><strong>ouverture mi Septembre</strong></h2>
                 </div>
 
-                <!-- Payment loading state will be dynamically created by JavaScript -->
+                <!-- Les deux boutons/cards exactement comme l'image -->
+                <div class="buttons-container">
+                    <button class="interest-button" data-option="interested">
+                        <div class="button-text">
+                            <strong>humm ça m'intéresse,<br>je vous lache mes contacts</strong>
+                            <div class="button-subtitle"><strong>c'est gratuit !</strong></div>
+                        </div>
+                    </button>
 
-                <!-- Back Button -->
-                <div id="back-button-container" class="hidden">
-                    <button id="back-to-choice" class="back-btn">
-                        <span class="back-arrow">←</span>
-                        <span>Retour aux options</span>
+                    <button class="membership-button" data-option="member">
+                        <div class="button-text">
+                            <strong>trooop bien, j'adhère direct<br>pour 12€ jusqu'à fin 2025</strong>
+                            <div class="button-gift">
+                                <span class="cadeau-text"><strong>Cadeau</strong></span><br>
+                                <span class="gift-description"><strong>je gagne une place au choix<br>durant le festival 4NAP<br>du 11 au 14 Juillet</strong></span>
+                            </div>
+                        </div>
                     </button>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Modal d'incitation Early Bird -->
-    <div id="upgrade-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>🎉 Pourquoi ne pas passer à Early Bird ?</h3>
-                <button class="modal-close">&times;</button>
+    <!-- Phase 2: Formulaire d'adhésion style mobile (reproduction de l'image) -->
+    <div id="adhesion-form-phase" class="adhesion-form-phase">
+        <button class="adhesion-back-btn" onclick="goBackToChoice()">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        
+        <div class="adhesion-form-header">
+            <h1 class="adhesion-form-title">formulaire d'adhésion</h1>
+            
+            <div class="adhesion-offer-text">
+                <span class="highlight-line">Pour 12€ j'ai une adhésion</span><br>
+                <span class="highlight-line">jusqu'à fin 2025 + une place offerte</span><br>
+                <span class="highlight-line">pour le 4NAP festival</span><br>
+                <span class="highlight-line">d'une valeur de 15€</span>
             </div>
-            <div class="modal-body">
-                <div class="upgrade-benefits">
-                    <div class="benefit-item">
-                        <div class="benefit-icon">🎫</div>
-                        <div class="benefit-text">
-                            <strong>Économisez sur le prochain festival au Fort</strong>
-                            <p>Place gratuite d'une valeur de 15€</p>
-                        </div>
+        </div>
+        
+        <form class="adhesion-form-container" id="adhesion-signup-form">
+            <input type="text" class="adhesion-input-field" placeholder="nom" name="lastname" required>
+            <input type="text" class="adhesion-input-field" placeholder="prénom" name="firstname" required>
+            <input type="date" class="adhesion-input-field" placeholder="date de naissance" name="birthdate" required>
+            <input type="text" class="adhesion-input-field" placeholder="code postal" name="zipcode" pattern="[0-9]{5}" required>
+            <input type="email" class="adhesion-input-field" placeholder="email" name="email" required>
+            <input type="tel" class="adhesion-input-field" placeholder="téléphone" name="phone" required>
+            
+            <button type="submit" class="adhesion-submit-btn">devenir membre</button>
+        </form>
+    </div>
+
+    <!-- Phase 3: Formulaire de prise de contact (reproduction de l'image jaune) -->
+    <div id="contact-form-phase" class="contact-form-phase">
+        <button class="contact-back-btn" onclick="goBackToChoice()">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        
+        <div class="contact-form-header">
+            <h1 class="contact-form-title">formulaire de prise de contact</h1>
+        </div>
+        
+        <form class="contact-form-container" id="contact-signup-form">
+            <input type="text" class="contact-input-field" placeholder="prénom" name="firstname" required>
+            <input type="email" class="contact-input-field" placeholder="email" name="email" required>
+            <input type="tel" class="contact-input-field" placeholder="téléphone" name="phone" required>
+            
+            <button type="submit" class="contact-submit-btn">envoi</button>
+        </form>
+    </div>
+
+    <!-- Phase 4: Écran de succès pour les intéressés -->
+    <div id="contact-success-phase" class="contact-success-phase">
+        <div class="success-content">
+            <div class="success-animation-new">
+                <div class="success-icon">🎉</div>
+            </div>
+            
+            <h1 class="success-title">Félicitations !</h1>
+            <h2 class="success-subtitle">Vous êtes bien inscrit</h2>
+            
+            <div class="success-message-content">
+                <p class="success-description">
+                    Merci pour votre intérêt ! Nous vous tiendrons informé(e) de l'ouverture 
+                    du tiers lieu et des premiers événements.
+                </p>
+                
+                <div class="success-benefits">
+                    <div class="benefit-item-success">
+                        <span class="benefit-icon-success">📧</span>
+                        <span>Newsletter exclusive</span>
                     </div>
-                    <div class="benefit-item">
-                        <div class="benefit-icon">🏢</div>
-                        <div class="benefit-text">
-                            <strong>Rejoignez la communauté ForNap</strong>
-                            <p>Accès exclusif à l'espace membres</p>
-                        </div>
+                    <div class="benefit-item-success">
+                        <span class="benefit-icon-success">🎯</span>
+                        <span>Infos en avant-première</span>
                     </div>
-                    <div class="benefit-item">
-                        <div class="benefit-icon">🎯</div>
-                        <div class="benefit-text">
-                            <strong>Programme fidélité exclusif</strong>
-                            <p>Avantages cumulables à vie</p>
-                        </div>
+                    <div class="benefit-item-success">
+                        <span class="benefit-icon-success">🎉</span>
+                        <span>Invitations aux événements</span>
                     </div>
                 </div>
-                <div class="modal-price">
-                    <span class="modal-price-text">Tout ça pour seulement <strong>0,55€</strong> !</span>
-                </div>
+                
+                <p class="stay-tuned">Stay tuned ! 🚀</p>
             </div>
-            <div class="modal-actions">
-                <button class="upgrade-btn" onclick="upgradeToMember()">
-                    <span>Passer à Early Bird</span>
-                    <span class="upgrade-arrow">🚀</span>
-                </button>
-                <button class="stay-btn" onclick="continueAsInterested()">
-                    Rester sur gratuit
-                </button>
-            </div>
+            
+            <button class="back-to-home-btn" onclick="goBackToChoice()">
+                <ion-icon name="home-outline"></ion-icon>
+                <span>Retour à l'accueil</span>
+            </button>
         </div>
     </div>
 
