@@ -281,17 +281,17 @@ class MemberSignup {
 
             const checkoutData = {
                 totalAmount: 1200, // 12€ en centimes
+                initialAmount: 1200, // Montant initial requis
+                itemName: "Adhésion Early Member ForNap 2025", // Au niveau racine
                 checkoutDescription: `Adhésion Early Member ForNap - ${formData.firstname} ${formData.lastname}`,
                 returnUrl: this.testReturnUrl,
+                backUrl: this.testReturnUrl + '?status=cancelled',
+                errorUrl: this.testReturnUrl + '?status=error',
                 containsDonation: false,
                 payer: {
                     firstName: formData.firstname,
                     lastName: formData.lastname,
-                    email: formData.email,
-                    address: {
-                        zipCode: formData.zipcode,
-                        country: "FRA"
-                    }
+                    email: formData.email
                 },
                 items: [{
                     name: "Adhésion Early Member ForNap 2025",
