@@ -545,17 +545,17 @@ class MemberSignup {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('portrait', 'mm', 'a4');
             
-            // Couleurs
+            // Couleurs - RETOUR AU ROSE SAUMON original
             const primaryColor = [32, 178, 170]; // Cyan #20B2AA
-            const secondaryColor = [23, 162, 184]; // Bleu #17A2B8
-            const darkColor = [26, 26, 26];
+            const pinkBackground = [255, 204, 204]; // Rose saumon #ffcccc
+            const darkColor = [0, 0, 0]; // Noir pour le texte
 
-            // Background
-            pdf.setFillColor(darkColor[0], darkColor[1], darkColor[2]);
+            // Background ROSE SAUMON comme avant
+            pdf.setFillColor(pinkBackground[0], pinkBackground[1], pinkBackground[2]);
             pdf.rect(0, 0, 210, 297, 'F');
 
             // Titre
-            pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            pdf.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
             pdf.setFontSize(28);
             pdf.setFont('helvetica', 'bold');
             pdf.text('CARTE MEMBRE', 105, 30, { align: 'center' });
@@ -597,7 +597,7 @@ class MemberSignup {
             pdf.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
 
             // Informations en bas
-            pdf.setTextColor(255, 255, 255);
+            pdf.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
             pdf.setFontSize(12);
             pdf.setFont('helvetica', 'normal');
             pdf.text('Scannez ce code pour accéder à vos avantages membres', 105, 270, { align: 'center' });
@@ -615,39 +615,35 @@ class MemberSignup {
             pdf.setFont('helvetica', 'bold');
             pdf.text('🔥 EARLY MEMBER STATUS', 105, 113, { align: 'center' });
 
-            // Informations membre
-            pdf.setTextColor(255, 255, 255);
+            // Informations simplifiées (sans référence à memberData)
+            pdf.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
             pdf.setFontSize(14);
             pdf.setFont('helvetica', 'bold');
-            pdf.text('Membre:', 30, 150);
-            pdf.text('Email:', 30, 170);
-            pdf.text('Téléphone:', 30, 190);
-            pdf.text('Adhésion:', 30, 210);
-            pdf.text('Statut:', 30, 230);
+            pdf.text('ID Membre:', 30, 150);
+            pdf.text('Adhésion:', 30, 170);
+            pdf.text('Statut:', 30, 190);
 
-            // Valeurs
+            // Valeurs simplifiées
             pdf.setFont('helvetica', 'normal');
-            pdf.text(`${memberData.firstname} ${memberData.lastname}`, 75, 150);
-            pdf.text(memberData.email, 75, 170);
-            pdf.text(memberData.phone, 75, 190);
-            pdf.text('Jusqu\'à fin 2025', 75, 210);
+            pdf.text(this.memberDocumentId, 75, 150);
+            pdf.text('Jusqu\'à fin 2025', 75, 170);
             pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-            pdf.text('ACTIF', 75, 230);
+            pdf.text('ACTIF', 75, 190);
 
             // Avantages
             pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
             pdf.setFontSize(16);
             pdf.setFont('helvetica', 'bold');
-            pdf.text('Vos avantages Early Member:', 30, 260);
+            pdf.text('Vos avantages Early Member:', 30, 220);
 
-            pdf.setTextColor(255, 255, 255);
+            pdf.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
             pdf.setFontSize(12);
             pdf.setFont('helvetica', 'normal');
-            pdf.text('• Place festival gratuite (valeur 15€)', 35, 275);
-            pdf.text('• Accès exclusif ForNap', 35, 285);
-            pdf.text('• Droit de vote sur les décisions', 35, 295);
-            pdf.text('• Programme fidélité exclusif', 35, 305);
-            pdf.text('• Statut d\'Early Member à vie', 35, 315);
+            pdf.text('• Place festival gratuite (valeur 15€)', 35, 235);
+            pdf.text('• Accès exclusif ForNap', 35, 245);
+            pdf.text('• Droit de vote sur les décisions', 35, 255);
+            pdf.text('• Programme fidélité exclusif', 35, 265);
+            pdf.text('• Statut d\'Early Member à vie', 35, 275);
 
             // Télécharger le PDF
             pdf.save(`ForNap-Carte-Membre-${this.memberDocumentId}.pdf`);
