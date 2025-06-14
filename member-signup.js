@@ -218,17 +218,21 @@ class MemberSignup {
 
     async initializeHelloAssoPayment(formData) {
         try {
-            console.log('Début du processus de paiement HelloAsso');
+            console.log('=== DEBUT initializeHelloAssoPayment ===');
+            console.log('Données reçues:', formData);
             
             // Afficher l'état de chargement
+            console.log('Affichage de l\'état de chargement...');
             this.showLoadingState();
             
             // Créer la commande HelloAsso
+            console.log('Création du checkout intent...');
             const checkoutIntent = await this.createCheckoutIntent(formData);
             console.log('Checkout intent reçu:', checkoutIntent);
             
             if (checkoutIntent && checkoutIntent.redirectUrl) {
-                console.log('Redirection vers:', checkoutIntent.redirectUrl);
+                console.log('URL de redirection trouvée:', checkoutIntent.redirectUrl);
+                console.log('Redirection vers HelloAsso en cours...');
                 // Rediriger vers HelloAsso
                 window.location.href = checkoutIntent.redirectUrl;
             } else {
@@ -237,16 +241,24 @@ class MemberSignup {
             }
             
         } catch (error) {
-            console.error('Erreur paiement HelloAsso:', error);
+            console.error('ERREUR dans initializeHelloAssoPayment:', error);
+            console.error('Stack trace complet:', error.stack);
             this.hideLoadingState();
             this.showError(`Erreur lors de l'initialisation du paiement: ${error.message}`);
         }
+        
+        console.log('=== FIN initializeHelloAssoPayment ===');
     }
 
     async createCheckoutIntent(formData) {
         try {
+            console.log('=== DEBUT createCheckoutIntent ===');
+            console.log('FormData reçu:', formData);
+            
             // 1. Obtenir un token d'accès
+            console.log('1. Obtention du token d\'accès...');
             const accessToken = await this.getAccessToken();
+            console.log('Token obtenu:', accessToken ? 'OUI' : 'NON');
             
             // 2. Créer l'intent de checkout
             // Construction des URLs de retour sécurisées
@@ -255,8 +267,10 @@ class MemberSignup {
             
             // Utiliser l'URL GitHub Pages pour tous les environnements
             const baseReturnUrl = isLocal ? this.testReturnUrl : 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
+            console.log('URLs configurées:', { currentUrl, isLocal, baseReturnUrl });
 
             // Sauvegarder d'abord en Firebase pour avoir un ID
+            console.log('2. Sauvegarde en Firebase...');
             const memberDocId = await this.saveToFirebase('members', {
                 ...formData,
                 paymentStatus: 'pending'
@@ -274,9 +288,8 @@ class MemberSignup {
                     firstName: formData.firstname,
                     lastName: formData.lastname,
                     email: formData.email,
-                    dateOfBirth: formData.birthdate,
                     address: {
-                    zipCode: formData.zipcode,
+                        zipCode: formData.zipcode,
                         country: "FRA"
                     }
                 },
@@ -289,14 +302,10 @@ class MemberSignup {
                 }]
             };
 
-            console.log('URLs de retour configurées:', {
-                backUrl: checkoutData.backUrl,
-                errorUrl: checkoutData.errorUrl,
-                returnUrl: checkoutData.returnUrl,
-                baseReturnUrl: baseReturnUrl,
-                currentUrl: currentUrl
-            });
+            console.log('3. Données de checkout préparées:', checkoutData);
+            console.log('3b. JSON stringifié:', JSON.stringify(checkoutData, null, 2));
 
+            console.log('4. Envoi de la requête à HelloAsso...');
             const response = await fetch(`${this.baseUrl}/organizations/${this.organizationSlug}/checkout-intents`, {
                 method: 'POST',
                 headers: {
@@ -306,21 +315,27 @@ class MemberSignup {
                 body: JSON.stringify(checkoutData)
             });
 
+            console.log('Statut de la réponse:', response.status);
+            console.log('Headers de la réponse:', [...response.headers.entries()]);
+
             if (!response.ok) {
                 const errorData = await response.text();
                 console.error('Erreur API HelloAsso:', response.status, errorData);
-                throw new Error(`Erreur API: ${response.status}`);
+                throw new Error(`Erreur API: ${response.status} - ${errorData}`);
             }
 
             const result = await response.json();
-            console.log('Checkout intent créé:', result);
+            console.log('5. Checkout intent créé avec succès:', result);
             
             return result;
             
         } catch (error) {
-            console.error('Erreur lors de la création du checkout intent:', error);
+            console.error('ERREUR dans createCheckoutIntent:', error);
+            console.error('Stack trace:', error.stack);
             throw error;
         }
+        
+        console.log('=== FIN createCheckoutIntent ===');
     }
 
     async getAccessToken() {
@@ -750,11 +765,28 @@ class MemberSignup {
     }
 
     async handleAdhesionSubmit() {
+        console.log('=== DEBUT handleAdhesionSubmit ===');
+        
         const form = document.getElementById('adhesion-signup-form');
+        if (!form) {
+            console.error('Formulaire adhesion-signup-form non trouvé !');
+            this.showError('Erreur: formulaire non trouvé');
+            return;
+        }
+        
         const formData = new FormData(form);
+        console.log('FormData récupéré:', {
+            lastname: formData.get('lastname'),
+            firstname: formData.get('firstname'),
+            birthdate: formData.get('birthdate'),
+            zipcode: formData.get('zipcode'),
+            email: formData.get('email'),
+            phone: formData.get('phone')
+        });
         
         const birthdate = formData.get('birthdate');
         const age = this.calculateAge(birthdate);
+        console.log('Âge calculé:', age);
         
         const memberData = {
             type: 'member',
@@ -768,33 +800,49 @@ class MemberSignup {
             timestamp: new Date().toISOString()
         };
 
+        console.log('Données membre préparées:', memberData);
+
         try {
+            console.log('Début des validations...');
+            
             // Validation
             if (!this.validateEmail(memberData.email)) {
+                console.log('Email invalide:', memberData.email);
                 this.showError('Veuillez saisir un email valide');
                 return;
             }
+            console.log('Email valide');
 
             if (!this.validateZipCode(memberData.zipcode)) {
+                console.log('Code postal invalide:', memberData.zipcode);
                 this.showError('Veuillez saisir un code postal valide (5 chiffres)');
                 return;
             }
+            console.log('Code postal valide');
 
             if (age < 16) {
+                console.log('Âge insuffisant:', age);
                 this.showError('Vous devez avoir au moins 16 ans pour adhérer');
                 return;
             }
+            console.log('Âge valide');
 
+            console.log('Toutes les validations passées, sauvegarde des données...');
+            
             // Sauvegarder les données temporairement
             this.currentFormData = memberData;
             
+            console.log('Initialisation du paiement HelloAsso...');
             // Initialiser le paiement HelloAsso
             await this.initializeHelloAssoPayment(memberData);
 
         } catch (error) {
-            console.error('Erreur lors de l\'inscription:', error);
+            console.error('ERREUR dans handleAdhesionSubmit:', error);
+            console.error('Stack trace:', error.stack);
             this.showError('Une erreur est survenue. Veuillez réessayer.');
         }
+        
+        console.log('=== FIN handleAdhesionSubmit ===');
     }
 
     async handleContactSubmit() {
