@@ -294,38 +294,41 @@ class MemberSignup {
             this.hideAllForms();
             this.hideLoadingState();
             
-            // Créer et afficher le conteneur de paiement Square
-            const paymentContainer = document.getElementById('square-payment-form');
-            if (!paymentContainer) {
-                // Créer le conteneur s'il n'existe pas
-                const container = document.createElement('div');
-                container.id = 'square-payment-form';
-                container.className = 'square-payment-container';
-                container.innerHTML = `
-                    <div class="payment-form-header">
-                        <h2>Finaliser votre adhésion</h2>
-                        <p>Montant : <strong>12,00 €</strong></p>
-                        <p>Type : Adhésion Early Member ForNap 2025</p>
-                    </div>
-                    <div id="card-container" class="card-input-container"></div>
-                    <div class="payment-buttons">
-                        <button id="card-button" class="payment-button" type="button">
-                            Payer 12,00 €
-                        </button>
-                        <button id="cancel-payment" class="secondary-button" type="button">
-                            Annuler
-                        </button>
-                    </div>
-                    <div id="payment-status" class="payment-status"></div>
-                `;
-                
-                // Ajouter le conteneur à la page
-                const mainContainer = document.querySelector('.container') || document.body;
-                mainContainer.appendChild(container);
-            }
+                    // Créer et afficher le conteneur de paiement Square
+        let paymentContainer = document.getElementById('square-payment-form');
+        if (!paymentContainer) {
+            // Créer le conteneur s'il n'existe pas
+            const container = document.createElement('div');
+            container.id = 'square-payment-form';
+            container.className = 'square-payment-container';
+            container.innerHTML = `
+                <div class="payment-form-header">
+                    <h2>Finaliser votre adhésion</h2>
+                    <p>Montant : <strong>12,00 €</strong></p>
+                    <p>Type : Adhésion Early Member ForNap 2025</p>
+                </div>
+                <div id="card-container" class="card-input-container"></div>
+                <div class="payment-buttons">
+                    <button id="card-button" class="payment-button" type="button">
+                        Payer 12,00 €
+                    </button>
+                    <button id="cancel-payment" class="secondary-button" type="button">
+                        Annuler
+                    </button>
+                </div>
+                <div id="payment-status" class="payment-status"></div>
+            `;
             
-            // Afficher le conteneur
-            paymentContainer.classList.remove('hidden');
+            // Ajouter le conteneur à la page
+            const mainContainer = document.querySelector('.container') || document.body;
+            mainContainer.appendChild(container);
+            
+            // Mettre à jour la référence
+            paymentContainer = container;
+        }
+        
+        // Afficher le conteneur
+        paymentContainer.classList.remove('hidden');
             
             // Attacher le formulaire de carte Square
             await this.card.attach('#card-container');
