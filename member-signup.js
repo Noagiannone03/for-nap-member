@@ -84,7 +84,9 @@ class MemberSignup {
 
         // Nouveau formulaire d'adhésion
         if (adhesionForm) {
+            console.log('Ajout event listener sur adhesion-signup-form');
             adhesionForm.addEventListener('submit', (e) => {
+                console.log('Event submit déclenché sur adhesion-signup-form');
                 e.preventDefault();
                 this.handleAdhesionSubmit();
             });
@@ -1043,18 +1045,8 @@ class MemberSignup {
             console.error('ERREUR: Element adhesion-form-phase non trouvé !');
         }
         
-        // Configurer l'événement de soumission du formulaire d'adhésion
-        const adhesionForm = document.getElementById('adhesion-signup-form');
-        console.log('Formulaire adhesion-signup-form trouvé:', adhesionForm);
-        
-        if (adhesionForm && !adhesionForm.hasAttribute('data-listener-added')) {
-            adhesionForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleAdhesionSubmit();
-            });
-            adhesionForm.setAttribute('data-listener-added', 'true');
-            console.log('Event listener ajouté au formulaire d\'adhésion');
-        }
+        // L'événement de soumission est déjà configuré dans setupEventListeners()
+        console.log('Event listener déjà configuré dans setupEventListeners');
         
         console.log('=== Fin showAdhesionFormPhase ===');
     }
