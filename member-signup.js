@@ -65,6 +65,8 @@ class MemberSignup {
         // Forms
         const interestedForm = document.getElementById('interested-signup');
         const memberForm = document.getElementById('member-signup');
+        const adhesionForm = document.getElementById('adhesion-signup-form');
+        const contactForm = document.getElementById('contact-signup-form');
 
         if (interestedForm) {
             interestedForm.addEventListener('submit', (e) => {
@@ -77,6 +79,22 @@ class MemberSignup {
             memberForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.handleMemberSubmit();
+            });
+        }
+
+        // Nouveau formulaire d'adhésion
+        if (adhesionForm) {
+            adhesionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleAdhesionSubmit();
+            });
+        }
+
+        // Nouveau formulaire de contact
+        if (contactForm) {
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleContactSubmit();
             });
         }
 
@@ -98,15 +116,18 @@ class MemberSignup {
     }
 
     handleChoiceSelection(mode) {
+        console.log('=== handleChoiceSelection appelé avec mode:', mode);
         this.currentMode = mode;
         
         if (mode === 'interested') {
+            console.log('Redirection vers phase de contact...');
             // Rediriger directement vers la phase de contact
             this.showContactFormPhase();
             return;
         }
         
         if (mode === 'member') {
+            console.log('Redirection vers phase d\'adhésion...');
             // Activer la nouvelle phase du formulaire d'adhésion
             this.showAdhesionFormPhase();
             return;
@@ -1005,22 +1026,37 @@ class MemberSignup {
     }
 
     showAdhesionFormPhase() {
+        console.log('=== showAdhesionFormPhase appelé ===');
+        
         // Ajouter la classe pour masquer le contenu principal
         document.body.classList.add('adhesion-phase-active');
+        console.log('Classe adhesion-phase-active ajoutée au body');
         
         // Afficher la phase d'adhésion avec animation
         const adhesionPhase = document.getElementById('adhesion-form-phase');
-        adhesionPhase.classList.add('active');
+        console.log('Element adhesion-form-phase trouvé:', adhesionPhase);
+        
+        if (adhesionPhase) {
+            adhesionPhase.classList.add('active');
+            console.log('Classe active ajoutée à adhesion-form-phase');
+        } else {
+            console.error('ERREUR: Element adhesion-form-phase non trouvé !');
+        }
         
         // Configurer l'événement de soumission du formulaire d'adhésion
         const adhesionForm = document.getElementById('adhesion-signup-form');
+        console.log('Formulaire adhesion-signup-form trouvé:', adhesionForm);
+        
         if (adhesionForm && !adhesionForm.hasAttribute('data-listener-added')) {
             adhesionForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.handleAdhesionSubmit();
             });
             adhesionForm.setAttribute('data-listener-added', 'true');
+            console.log('Event listener ajouté au formulaire d\'adhésion');
         }
+        
+        console.log('=== Fin showAdhesionFormPhase ===');
     }
 
     showContactFormPhase() {
