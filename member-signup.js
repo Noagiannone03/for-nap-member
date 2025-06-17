@@ -1045,10 +1045,43 @@ class MemberSignup {
             console.error('ERREUR: Element adhesion-form-phase non trouvé !');
         }
         
-        // L'événement de soumission est déjà configuré dans setupEventListeners()
-        console.log('Event listener déjà configuré dans setupEventListeners');
+        // 🔧 FORCER LE VIDAGE DES CHAMPS POUR EMPÊCHER LA SOUMISSION AUTO
+        this.clearAndPrepareAdhesionForm();
         
         console.log('=== Fin showAdhesionFormPhase ===');
+    }
+
+    clearAndPrepareAdhesionForm() {
+        console.log('🔧 Nettoyage du formulaire d\'adhésion...');
+        
+        const form = document.getElementById('adhesion-signup-form');
+        if (!form) return;
+        
+        // Vider tous les champs
+        const fields = form.querySelectorAll('input');
+        fields.forEach(field => {
+            field.value = '';
+            field.removeAttribute('value');
+        });
+        
+        // Désactiver l'autocomplétion
+        form.setAttribute('autocomplete', 'off');
+        fields.forEach(field => {
+            field.setAttribute('autocomplete', 'off');
+        });
+        
+        // Marquer le formulaire comme "non-prêt" pour empêcher la soumission automatique
+        form.setAttribute('data-user-filled', 'false');
+        
+        // Ajouter des événements pour détecter quand l'utilisateur tape
+        fields.forEach(field => {
+            field.addEventListener('input', () => {
+                form.setAttribute('data-user-filled', 'true');
+                console.log('Utilisateur a commencé à remplir le formulaire');
+            });
+        });
+        
+        console.log('✅ Formulaire nettoyé et préparé pour l\'utilisateur');
     }
 
     showContactFormPhase() {
@@ -1091,6 +1124,13 @@ class MemberSignup {
         if (!form) {
             console.error('Formulaire adhesion-signup-form non trouvé !');
             this.showError('Erreur: formulaire non trouvé');
+            return;
+        }
+
+        // 🛡️ VÉRIFICATION ANTI-SOUMISSION AUTOMATIQUE
+        const userHasFilled = form.getAttribute('data-user-filled') === 'true';
+        if (!userHasFilled) {
+            console.log('⚠️ SOUMISSION BLOQUÉE: L\'utilisateur n\'a pas encore rempli le formulaire');
             return;
         }
         

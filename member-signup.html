@@ -77,13 +77,13 @@
             </div>
         </div>
         
-        <form class="adhesion-form-container" id="adhesion-signup-form">
-            <input type="text" class="adhesion-input-field" placeholder="nom" name="lastname" required>
-            <input type="text" class="adhesion-input-field" placeholder="prénom" name="firstname" required>
-            <input type="date" class="adhesion-input-field" placeholder="date de naissance" name="birthdate" required>
-            <input type="text" class="adhesion-input-field" placeholder="code postal" name="zipcode" pattern="[0-9]{5}" required>
-            <input type="email" class="adhesion-input-field" placeholder="email" name="email" required>
-            <input type="tel" class="adhesion-input-field" placeholder="téléphone" name="phone" required>
+        <form class="adhesion-form-container" id="adhesion-signup-form" autocomplete="off">
+            <input type="text" class="adhesion-input-field" placeholder="nom" name="lastname" autocomplete="off" required>
+            <input type="text" class="adhesion-input-field" placeholder="prénom" name="firstname" autocomplete="off" required>
+            <input type="date" class="adhesion-input-field" placeholder="date de naissance" name="birthdate" autocomplete="off" required>
+            <input type="text" class="adhesion-input-field" placeholder="code postal" name="zipcode" pattern="[0-9]{5}" autocomplete="off" required>
+            <input type="email" class="adhesion-input-field" placeholder="email" name="email" autocomplete="off" required>
+            <input type="tel" class="adhesion-input-field" placeholder="téléphone" name="phone" autocomplete="off" required>
             
             <button type="submit" class="adhesion-submit-btn">devenir membre</button>
         </form>
