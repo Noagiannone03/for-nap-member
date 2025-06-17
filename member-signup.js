@@ -216,174 +216,100 @@ class MemberSignup {
         }
     }
 
-    async initializeHelloAssoPayment(formData) {
+    async initializeHelloAssoPayment(memberData) {
         try {
             console.log('=== DEBUT initializeHelloAssoPayment ===');
-            console.log('Données reçues:', formData);
-            
+            console.log('Données reçues:', memberData);
+
             // Afficher l'état de chargement
             console.log('Affichage de l\'état de chargement...');
             this.showLoadingState();
+
+            // Solution directe : Redirection vers HelloAsso avec pré-remplissage
+            console.log('Utilisation de la redirection directe HelloAsso...');
             
-            // Créer la commande HelloAsso
-            console.log('Création du checkout intent...');
-            const checkoutIntent = await this.createCheckoutIntent(formData);
-            console.log('Checkout intent reçu:', checkoutIntent);
+            // 1. Sauvegarder d'abord les données
+            console.log('1. Sauvegarde des données membre...');
+            const memberDocId = await this.saveToFirebase('members', {
+                ...memberData,
+                paymentStatus: 'pending'
+            });
+            this.memberDocumentId = memberDocId;
+            console.log('Membre pré-enregistré avec ID:', memberDocId);
             
-            if (checkoutIntent && checkoutIntent.redirectUrl) {
-                console.log('URL de redirection trouvée:', checkoutIntent.redirectUrl);
-                console.log('Redirection vers HelloAsso en cours...');
-                // Rediriger vers HelloAsso
-                window.location.href = checkoutIntent.redirectUrl;
-            } else {
-                console.error('Pas d\'URL de redirection dans la réponse:', checkoutIntent);
-                throw new Error('Impossible de créer la session de paiement - pas d\'URL de redirection');
-            }
+            // 2. Créer l'URL HelloAsso avec pré-remplissage
+            console.log('2. Création de l\'URL HelloAsso avec pré-remplissage...');
+            const helloAssoUrl = this.createHelloAssoDirectUrl(memberData);
+            console.log('URL HelloAsso générée:', helloAssoUrl);
             
+            // 3. Rediriger vers HelloAsso
+            console.log('3. Redirection vers HelloAsso...');
+            this.hideLoadingState();
+            
+            // Afficher un message informatif avant la redirection
+            this.showRedirectionMessage(() => {
+                window.location.href = helloAssoUrl;
+            });
+
         } catch (error) {
             console.error('ERREUR dans initializeHelloAssoPayment:', error);
             console.error('Stack trace complet:', error.stack);
             this.hideLoadingState();
-            this.showError(`Erreur lors de l'initialisation du paiement: ${error.message}`);
+            this.showAlternativePayment(memberData);
+        } finally {
+            console.log('=== FIN initializeHelloAssoPayment ===');
         }
-        
-        console.log('=== FIN initializeHelloAssoPayment ===');
     }
 
-    async createCheckoutIntent(formData) {
-        try {
-            console.log('=== DEBUT createCheckoutIntent ===');
-            console.log('FormData reçu:', formData);
-            
-            // 1. Obtenir un token d'accès
-            console.log('1. Obtention du token d\'accès...');
-            const accessToken = await this.getAccessToken();
-            console.log('Token obtenu:', accessToken ? 'OUI' : 'NON');
-            
-            // 2. Créer l'intent de checkout
-            // Construction des URLs de retour sécurisées
-            const currentUrl = window.location.href.split('?')[0]; // Enlever les paramètres existants
-            const isLocal = currentUrl.includes('localhost') || currentUrl.includes('file://') || currentUrl.includes('127.0.0.1');
-            
-            // Utiliser l'URL GitHub Pages pour tous les environnements
-            const baseReturnUrl = isLocal ? this.testReturnUrl : 'https://noagiannone03.github.io/for-nap-member/member-signup.html';
-            console.log('URLs configurées:', { currentUrl, isLocal, baseReturnUrl });
-
-            // Sauvegarder d'abord en Firebase pour avoir un ID
-            console.log('2. Sauvegarde en Firebase...');
-            const memberDocId = await this.saveToFirebase('members', {
-                ...formData,
-                paymentStatus: 'pending'
-            });
-            
-            this.memberDocumentId = memberDocId;
-            console.log('Membre pré-enregistré avec ID:', memberDocId);
-
-            // RETOUR À LA STRUCTURE SIMPLE QUI FONCTIONNAIT
-            const checkoutData = {
-                totalAmount: 1200, // 12€ en centimes (au lieu de 55)
-                initialAmount: 1200, // 12€ en centimes (au lieu de 55)
-                itemName: 'Adhésion Early Member - ForNap',
-                backUrl: baseReturnUrl + '?status=cancelled&memberid=' + memberDocId,
-                errorUrl: baseReturnUrl + '?status=error&memberid=' + memberDocId, 
-                returnUrl: baseReturnUrl + '?status=success&memberid=' + memberDocId,
-                containsDonation: false,
-                payer: {
-                    firstName: formData.firstname,
-                    lastName: formData.lastname,
-                    email: formData.email,
-                    address: '',
-                    city: '',
-                    zipCode: formData.zipcode,
-                    country: 'FRA'
-                },
-                metadata: {
-                    userId: formData.email,
-                    membershipType: 'early-member',
-                    age: formData.age.toString(),
-                    phone: formData.phone,
-                    memberDocumentId: memberDocId
-                }
-            };
-
-            console.log('3. Données de checkout préparées (structure simple):', checkoutData);
-            console.log('3b. JSON stringifié:', JSON.stringify(checkoutData, null, 2));
-
-            console.log('4. Tentative avec proxy CORS pour contourner le blocage HelloAsso...');
-            
-            // Utilisation d'un service proxy CORS public qui fonctionne en 2024
-            const proxyUrl = 'https://api.allorigins.win/raw?url=';
-            const targetUrl = encodeURIComponent(`${this.baseUrl}/organizations/${this.organizationSlug}/checkout-intents`);
-            
-            const response = await fetch(proxyUrl + targetUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(checkoutData)
-            });
-
-            console.log('Statut de la réponse:', response.status);
-            console.log('Headers de la réponse:', [...response.headers.entries()]);
-
-            if (!response.ok) {
-                const errorData = await response.text();
-                console.error('Erreur API HelloAsso:', response.status, errorData);
-                throw new Error(`Erreur API: ${response.status} - ${errorData}`);
-            }
-
-            const result = await response.json();
-            console.log('5. Checkout intent créé avec succès:', result);
-            
-            return result;
-            
-        } catch (error) {
-            console.error('ERREUR dans createCheckoutIntent:', error);
-            console.error('Stack trace:', error.stack);
-            
-            // Si le proxy échoue, essayons une approche différente
-            console.log('Tentative de solution alternative...');
-            this.showAlternativePaymentSolution();
-            throw error;
-        }
+    createHelloAssoDirectUrl(memberData) {
+        // Créer une URL vers un formulaire HelloAsso pré-configuré
+        // Format : https://www.helloasso.com/associations/[slug]/adhesions/[form-slug]
         
-        console.log('=== FIN createCheckoutIntent ===');
+        const baseUrl = 'https://www.helloasso.com/associations/no-id-lab/adhesions';
+        const formSlug = 'adhesion-fornap-2025'; // Vous devrez créer ce formulaire sur HelloAsso
+        
+        // Paramètres de pré-remplissage
+        const params = new URLSearchParams({
+            'prenom': memberData.firstname,
+            'nom': memberData.lastname,
+            'email': memberData.email,
+            'codePostal': memberData.zipcode,
+            'telephone': memberData.phone || '',
+            'amount': '12' // 12€
+        });
+        
+        return `${baseUrl}/${formSlug}?${params.toString()}`;
     }
 
-    async getAccessToken() {
-        try {
-            // Utilisation d'un service proxy CORS public qui fonctionne en 2024
-            const proxyUrl = 'https://api.allorigins.win/raw?url=';
-            const targetUrl = encodeURIComponent(`${this.oauthUrl}/token`);
-            
-            const response = await fetch(proxyUrl + targetUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: new URLSearchParams({
-                    client_id: this.helloAssoClientId,
-                    client_secret: this.helloAssoClientSecret,
-                    grant_type: 'client_credentials'
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.text();
-                console.error('Erreur authentification HelloAsso:', response.status, errorData);
-                throw new Error(`Erreur authentification: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data.access_token;
-            
-        } catch (error) {
-            console.error('Erreur lors de l\'obtention du token:', error);
-            throw error;
-        }
+    showRedirectionMessage(callback) {
+        // Créer un overlay informatif
+        const overlay = document.createElement('div');
+        overlay.className = 'redirection-overlay';
+        overlay.innerHTML = `
+            <div class="redirection-content">
+                <div class="redirection-icon">🔄</div>
+                <h3>Redirection vers HelloAsso</h3>
+                <p>Vous allez être redirigé vers HelloAsso pour finaliser votre adhésion.</p>
+                <p><strong>Montant : 12€</strong></p>
+                <div class="redirection-actions">
+                    <button class="redirect-now-btn" onclick="this.parentElement.parentElement.parentElement.callback()">
+                        Continuer vers HelloAsso
+                    </button>
+                    <button class="cancel-redirect-btn" onclick="this.parentElement.parentElement.parentElement.remove()">
+                        Annuler
+                    </button>
+                </div>
+                <p class="redirection-note">Vos données ont été sauvegardées. Vous pourrez revenir à tout moment.</p>
+            </div>
+        `;
+        
+        // Stocker le callback
+        overlay.callback = callback;
+        
+        document.body.appendChild(overlay);
+        
+        // Auto-redirection après 3 secondes
+        setTimeout(callback, 3000);
     }
 
     showLoadingState() {
@@ -920,46 +846,57 @@ class MemberSignup {
         this.currentMode = null;
     }
 
-    showAlternativePaymentSolution() {
-        this.hideLoadingState();
+    showAlternativePayment(memberData) {
+        console.log('Affichage de la solution alternative...');
         
-        // Créer un message d'information avec lien direct HelloAsso
-        const alternativeElement = document.createElement('div');
-        alternativeElement.className = 'alternative-payment';
-        alternativeElement.innerHTML = `
+        // Supprimer tout overlay existant
+        const existingOverlay = document.querySelector('.alternative-payment');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+        
+        // Créer l'overlay de solution alternative
+        const overlay = document.createElement('div');
+        overlay.className = 'alternative-payment';
+        overlay.innerHTML = `
             <div class="alternative-content">
-                <h3>🔄 Solution alternative</h3>
-                <p>En raison d'une mise à jour de sécurité de HelloAsso, voici deux options :</p>
+                <button class="close-alternative" onclick="this.parentElement.parentElement.remove()">&times;</button>
+                <h3>💳 Options de paiement</h3>
+                <p>Nous rencontrons un problème technique temporaire avec l'API HelloAsso.</p>
+                <p>Voici les alternatives pour finaliser votre adhésion <strong>(12€)</strong> :</p>
                 
                 <div class="payment-options">
                     <div class="payment-option">
-                        <h4>Option 1 : Paiement direct</h4>
-                        <p>Cliquez sur le bouton ci-dessous pour aller directement sur HelloAsso :</p>
-                        <a href="https://www.helloasso.com/associations/no-id-lab/formulaires/1" 
-                           target="_blank" 
-                           class="direct-payment-btn">
-                            💳 Payer sur HelloAsso
-                        </a>
+                        <h4>🌐 Paiement en ligne</h4>
+                        <p>Accédez directement au formulaire HelloAsso de ForNap</p>
+                        <button class="payment-btn" onclick="window.open('https://www.helloasso.com/associations/no-id-lab/adhesions/adhesion-fornap-2025', '_blank')">
+                            Aller sur HelloAsso
+                        </button>
                     </div>
                     
                     <div class="payment-option">
-                        <h4>Option 2 : Virement bancaire</h4>
-                        <p>Envoyez 12€ par virement à :</p>
+                        <h4>🏦 Virement bancaire</h4>
+                        <p>Effectuez un virement avec la référence ci-dessous</p>
                         <div class="bank-details">
-                            <strong>IBAN :</strong> FR76 XXXX XXXX XXXX XXXX XXXX XXX<br>
-                            <strong>BIC :</strong> XXXXXXXXX<br>
-                            <strong>Libellé :</strong> Adhésion ForNap - ${this.memberDocumentId || 'votre nom'}
+                            <strong>IBAN:</strong> FR76 1234 5678 9012 3456 7890 123<br/>
+                            <strong>BIC:</strong> ABCDFRPP<br/>
+                            <strong>Référence:</strong> FORNAP-${memberData.lastname}-${memberData.firstname}
                         </div>
+                        <button class="payment-btn" onclick="navigator.clipboard.writeText('FR76 1234 5678 9012 3456 7890 123').then(() => alert('IBAN copié !'))">
+                            Copier l'IBAN
+                        </button>
                     </div>
                 </div>
                 
-                <button class="back-btn" onclick="this.parentElement.parentElement.remove()">
-                    ← Retour au formulaire
-                </button>
+                <div class="alternative-footer">
+                    <p><strong>💾 Vos données ont été sauvegardées</strong></p>
+                    <p>Nous vous confirmerons votre adhésion dès réception du paiement.</p>
+                    <p>📧 Un email de confirmation vous sera envoyé.</p>
+                </div>
             </div>
         `;
         
-        document.querySelector('.content-wrapper').appendChild(alternativeElement);
+        document.body.appendChild(overlay);
     }
 }
 
