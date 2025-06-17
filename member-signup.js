@@ -265,9 +265,6 @@ class MemberSignup {
             console.log('=== DEBUT initializeSquarePayment ===');
             console.log('Données reçues:', formData);
             
-            // Afficher l'état de chargement
-            this.showLoadingState();
-            
             // Sauvegarder d'abord en Firebase pour avoir un ID
             const memberDocId = await this.saveToFirebase('members', {
                 ...formData,
@@ -277,30 +274,9 @@ class MemberSignup {
             this.memberDocumentId = memberDocId;
             console.log('Membre pré-enregistré avec ID:', memberDocId);
             
-            // Préparer les détails de vérification Square
-            const verificationDetails = {
-                amount: '12.00', // 12€ pour l'adhésion
-                currencyCode: 'EUR',
-                intent: 'CHARGE',
-                customerInitiated: true,
-                sellerKeyedIn: false,
-                billingContact: {
-                    givenName: formData.firstname,
-                    familyName: formData.lastname,
-                    email: formData.email,
-                    phone: formData.phone,
-                    addressLines: [],
-                    city: '',
-                    state: '',
-                    postalCode: formData.zipcode,
-                    countryCode: 'FR'
-                }
-            };
-            
-            console.log('Détails de vérification préparés:', verificationDetails);
-            
-            // Afficher le formulaire de paiement Square
-            await this.showSquarePaymentForm(verificationDetails, memberDocId);
+            // 🎯 AFFICHER DIRECTEMENT LE FORMULAIRE SQUARE
+            console.log('Affichage du formulaire Square...');
+            await this.showSquarePaymentForm(formData, memberDocId);
             
         } catch (error) {
             console.error('ERREUR dans initializeSquarePayment:', error);
@@ -311,8 +287,12 @@ class MemberSignup {
         console.log('=== FIN initializeSquarePayment ===');
     }
 
-    async showSquarePaymentForm(verificationDetails, memberDocId) {
+    async showSquarePaymentForm(formData, memberDocId) {
         try {
+            console.log('=== AFFICHAGE FORMULAIRE SQUARE ===');
+            console.log('FormData:', formData);
+            console.log('Member ID:', memberDocId);
+            
             // Masquer les autres formulaires
             this.hideAllForms();
             this.hideLoadingState();
@@ -320,107 +300,148 @@ class MemberSignup {
             // Créer et afficher le conteneur de paiement Square
             let paymentContainer = document.getElementById('square-payment-form');
             if (!paymentContainer) {
-                // Créer le conteneur s'il n'existe pas
                 const container = document.createElement('div');
                 container.id = 'square-payment-form';
                 container.className = 'square-payment-container';
                 container.innerHTML = `
                     <div class="payment-form-header">
-                        <h2>Finaliser votre adhésion</h2>
+                        <h2>💳 Finaliser votre adhésion</h2>
                         <p>Montant : <strong>12,00 €</strong></p>
-                        <p>Type : Adhésion Early Member ForNap 2025</p>
+                        <p>Membre: ${formData.firstname} ${formData.lastname}</p>
                     </div>
                     <div id="card-container" class="card-input-container"></div>
                     <div class="payment-buttons">
-                        <button id="card-button" class="payment-button" type="button">
-                            Payer 12,00 €
+                        <button id="card-button" class="payment-button" type="button" disabled>
+                            💳 Payer 12,00 €
                         </button>
                         <button id="cancel-payment" class="secondary-button" type="button">
-                            Annuler
+                            ❌ Annuler
                         </button>
                     </div>
-                    <div id="payment-status" class="payment-status"></div>
+                    <div id="payment-status" class="payment-status">
+                        <p>🔒 Paiement sécurisé par Square</p>
+                    </div>
                 `;
                 
-                // Ajouter le conteneur à la page
-                const mainContainer = document.querySelector('.container') || document.body;
-                mainContainer.appendChild(container);
-                
-                // Mettre à jour la référence
+                document.body.appendChild(container);
                 paymentContainer = container;
             } else {
                 // Nettoyer le conteneur existant
                 const cardContainer = document.getElementById('card-container');
                 const statusContainer = document.getElementById('payment-status');
                 if (cardContainer) cardContainer.innerHTML = '';
-                if (statusContainer) statusContainer.innerHTML = '';
+                if (statusContainer) statusContainer.innerHTML = '<p>🔒 Paiement sécurisé par Square</p>';
             }
         
-        // Afficher le conteneur
-        paymentContainer.classList.remove('hidden');
+            // Afficher le conteneur
+            paymentContainer.classList.remove('hidden');
+            console.log('✅ Conteneur Square affiché');
             
-            // Détacher l'instance de carte existante si elle est déjà attachée
+            // Détruire l'ancienne instance de carte si elle existe
             try {
                 if (this.card) {
                     await this.card.destroy();
+                    console.log('✅ Ancienne carte détruite');
                 }
             } catch (error) {
-                console.log('Aucune carte à détacher ou erreur lors du détachement:', error.message);
+                console.log('Aucune carte à détruire:', error.message);
             }
             
-            // Créer une nouvelle instance de carte
+            // Créer une nouvelle instance de carte selon la doc Square
             this.card = await this.payments.card();
+            console.log('✅ Nouvelle instance de carte créée');
             
-            // Attacher le formulaire de carte Square
+            // Attacher la carte au DOM selon la doc Square
             await this.card.attach('#card-container');
+            console.log('✅ Carte attachée au DOM');
             
-            // Configurer les événements
-            this.setupSquarePaymentEvents(verificationDetails, memberDocId);
+            // Activer le bouton de paiement
+            const cardButton = document.getElementById('card-button');
+            cardButton.disabled = false;
+            cardButton.textContent = '💳 Payer 12,00 €';
+            
+            // Configurer les événements selon la doc Square
+            this.setupSquarePaymentEvents(formData, memberDocId);
+            console.log('✅ Événements configurés');
             
         } catch (error) {
-            console.error('Erreur lors de l\'affichage du formulaire Square:', error);
+            console.error('❌ Erreur lors de l\'affichage du formulaire Square:', error);
+            this.showError(`Erreur d'affichage du paiement: ${error.message}`);
             throw error;
         }
     }
 
-    setupSquarePaymentEvents(verificationDetails, memberDocId) {
+    setupSquarePaymentEvents(formData, memberDocId) {
         const cardButton = document.getElementById('card-button');
         const cancelButton = document.getElementById('cancel-payment');
         const statusDiv = document.getElementById('payment-status');
         
-        // Bouton de paiement
+        console.log('🔧 Configuration des événements Square...');
+        
+        // Bouton de paiement selon la documentation Square
         cardButton.addEventListener('click', async () => {
             try {
-                cardButton.disabled = true;
-                cardButton.textContent = 'Traitement en cours...';
-                statusDiv.innerHTML = '<div class="loading">Traitement du paiement...</div>';
+                console.log('🎯 Début du processus de paiement Square');
                 
-                // Tokeniser la carte avec les détails de vérification
+                cardButton.disabled = true;
+                cardButton.textContent = '⏳ Traitement...';
+                statusDiv.innerHTML = '<div class="loading">💳 Tokenisation en cours...</div>';
+                
+                // Préparer les détails de vérification selon la doc Square
+                const verificationDetails = {
+                    amount: '12.00',
+                    currencyCode: 'EUR',
+                    intent: 'CHARGE',
+                    customerInitiated: true,
+                    sellerKeyedIn: false,
+                    billingContact: {
+                        givenName: formData.firstname,
+                        familyName: formData.lastname,
+                        email: formData.email,
+                        phone: formData.phone || '',
+                        addressLines: [],
+                        city: '',
+                        state: '',
+                        postalCode: formData.zipcode,
+                        countryCode: 'FR'
+                    }
+                };
+                
+                console.log('📋 Détails de vérification:', verificationDetails);
+                
+                // Tokeniser la carte selon la doc Square
+                console.log('🔑 Tokenisation de la carte...');
                 const tokenResult = await this.card.tokenize(verificationDetails);
                 
                 if (tokenResult.status === 'OK') {
                     const paymentToken = tokenResult.token;
-                    console.log('Token Square reçu:', paymentToken);
+                    console.log('✅ Token Square reçu:', paymentToken);
+                    
+                    statusDiv.innerHTML = '<div class="loading">💰 Traitement du paiement...</div>';
                     
                     // Traiter le paiement
                     await this.processSquarePayment(paymentToken, verificationDetails, memberDocId);
                     
                 } else {
-                    throw new Error(`Erreur de tokenisation: ${tokenResult.status} - ${JSON.stringify(tokenResult.errors)}`);
+                    console.error('❌ Erreur de tokenisation:', tokenResult);
+                    throw new Error(`Tokenisation échouée: ${tokenResult.status} - ${JSON.stringify(tokenResult.errors)}`);
                 }
                 
             } catch (error) {
-                console.error('Erreur lors du paiement:', error);
-                statusDiv.innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
+                console.error('❌ Erreur lors du paiement:', error);
+                statusDiv.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
                 cardButton.disabled = false;
-                cardButton.textContent = 'Payer 12,00 €';
+                cardButton.textContent = '💳 Payer 12,00 €';
             }
         });
         
         // Bouton d'annulation
         cancelButton.addEventListener('click', async () => {
+            console.log('❌ Annulation du paiement');
             await this.handlePaymentCancellation();
         });
+        
+        console.log('✅ Événements Square configurés');
     }
 
     async processSquarePayment(paymentToken, verificationDetails, memberDocId) {
