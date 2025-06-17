@@ -279,33 +279,37 @@ class MemberSignup {
             this.memberDocumentId = memberDocId;
             console.log('Membre pré-enregistré avec ID:', memberDocId);
 
+            // RETOUR À LA STRUCTURE SIMPLE QUI FONCTIONNAIT
             const checkoutData = {
-                totalAmount: 1200, // 12€ en centimes
-                initialAmount: 1200, // Montant initial requis
-                itemName: "Adhésion Early Member ForNap 2025", // Au niveau racine
-                checkoutDescription: `Adhésion Early Member ForNap - ${formData.firstname} ${formData.lastname}`,
-                returnUrl: this.testReturnUrl,
-                backUrl: this.testReturnUrl + '?status=cancelled',
-                errorUrl: this.testReturnUrl + '?status=error',
+                totalAmount: 1200, // 12€ en centimes (au lieu de 55)
+                initialAmount: 1200, // 12€ en centimes (au lieu de 55)
+                itemName: 'Adhésion Early Member - ForNap',
+                backUrl: baseReturnUrl + '?status=cancelled&memberid=' + memberDocId,
+                errorUrl: baseReturnUrl + '?status=error&memberid=' + memberDocId, 
+                returnUrl: baseReturnUrl + '?status=success&memberid=' + memberDocId,
                 containsDonation: false,
                 payer: {
                     firstName: formData.firstname,
                     lastName: formData.lastname,
-                    email: formData.email
+                    email: formData.email,
+                    address: '',
+                    city: '',
+                    zipCode: formData.zipcode,
+                    country: 'FRA'
                 },
-                items: [{
-                    name: "Adhésion Early Member ForNap 2025",
-                    priceCategory: "Fixed",
-                    amount: 1200, // 12€ en centimes
-                    type: "Payment",
-                    description: "Adhésion Early Member jusqu'à fin 2025 + place festival offerte (valeur 15€)"
-                }]
+                metadata: {
+                    userId: formData.email,
+                    membershipType: 'early-member',
+                    age: formData.age.toString(),
+                    phone: formData.phone,
+                    memberDocumentId: memberDocId
+                }
             };
 
-            console.log('3. Données de checkout préparées:', checkoutData);
+            console.log('3. Données de checkout préparées (structure simple):', checkoutData);
             console.log('3b. JSON stringifié:', JSON.stringify(checkoutData, null, 2));
 
-            console.log('4. Envoi de la requête à HelloAsso...');
+            console.log('4. Envoi de la requête à HelloAsso (structure originale)...');
             const response = await fetch(`${this.baseUrl}/organizations/${this.organizationSlug}/checkout-intents`, {
                 method: 'POST',
                 headers: {
@@ -793,6 +797,7 @@ class MemberSignup {
             zipcode: formData.get('zipcode'),
             email: formData.get('email'),
             phone: formData.get('phone'),
+            amount: 1200, // 12€ en centimes (au lieu de 55)
             timestamp: new Date().toISOString()
         };
 
