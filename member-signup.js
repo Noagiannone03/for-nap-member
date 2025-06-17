@@ -15,7 +15,7 @@ class MemberSignup {
         // Configuration du serveur proxy (solution recommandée par HelloAsso)
         this.proxyServerUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
             ? 'http://localhost:3000' 
-            : 'http://YOUR_VPS_IP:3000'; // Remplacez YOUR_VPS_IP par l'IP de votre VPS
+            : 'http://api.4nap.fr:3000'; // Serveur proxy HelloAsso sur VPS 4NAP
         
         this.init();
     }
