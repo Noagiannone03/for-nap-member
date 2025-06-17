@@ -15,7 +15,7 @@ class MemberSignup {
         // Configuration du serveur proxy (solution recommandée par HelloAsso)
         this.proxyServerUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
             ? 'http://localhost:3000' 
-            : 'https://your-proxy-server.com'; // À remplacer par votre serveur déployé
+            : 'http://YOUR_VPS_IP:3000'; // Remplacez YOUR_VPS_IP par l'IP de votre VPS
         
         this.init();
     }
