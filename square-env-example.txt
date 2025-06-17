@@ -1,0 +1,17 @@
+# Configuration Square - Mode Sandbox
+SQUARE_ENVIRONMENT=sandbox
+SQUARE_ACCESS_TOKEN=votre_sandbox_access_token_ici
+SQUARE_APPLICATION_ID=votre_sandbox_application_id_ici
+SQUARE_LOCATION_ID=votre_sandbox_location_id_ici
+
+# Configuration Square - Mode Production (à utiliser en production)
+# SQUARE_ENVIRONMENT=production
+# SQUARE_ACCESS_TOKEN=votre_production_access_token_ici
+# SQUARE_APPLICATION_ID=votre_production_application_id_ici
+# SQUARE_LOCATION_ID=votre_production_location_id_ici
+
+# Configuration serveur
+PORT=3000
+
+# URLs autorisées (CORS)
+ALLOWED_ORIGINS=https://noagiannone03.github.io,http://localhost:3000,http://127.0.0.1:3000 

@@ -1,0 +1,26 @@
+{
+  "name": "fornap-square-payment",
+  "version": "2.0.0",
+  "description": "Serveur de paiement Square pour ForNap - Migration depuis HelloAsso",
+  "main": "square-server.js",
+  "scripts": {
+    "start": "node square-server.js",
+    "dev": "nodemon square-server.js",
+    "test": "node -e \"console.log('Serveur ForNap Square prêt')\""
+  },
+  "keywords": ["square", "payment", "fornap", "nodejs"],
+  "author": "ForNap",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "squareup": "^31.0.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+} 
