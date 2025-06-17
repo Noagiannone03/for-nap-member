@@ -311,8 +311,11 @@ class MemberSignup {
 
             console.log('4. Tentative avec proxy CORS pour contourner le blocage HelloAsso...');
             
-            // Utilisation d'un service proxy CORS public
-            const response = await fetch('https://cors-anywhere.herokuapp.com/' + `${this.baseUrl}/organizations/${this.organizationSlug}/checkout-intents`, {
+            // Utilisation d'un service proxy CORS public qui fonctionne en 2024
+            const proxyUrl = 'https://api.allorigins.win/raw?url=';
+            const targetUrl = encodeURIComponent(`${this.baseUrl}/organizations/${this.organizationSlug}/checkout-intents`);
+            
+            const response = await fetch(proxyUrl + targetUrl, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -351,7 +354,11 @@ class MemberSignup {
 
     async getAccessToken() {
         try {
-            const response = await fetch('https://cors-anywhere.herokuapp.com/' + `${this.oauthUrl}/token`, {
+            // Utilisation d'un service proxy CORS public qui fonctionne en 2024
+            const proxyUrl = 'https://api.allorigins.win/raw?url=';
+            const targetUrl = encodeURIComponent(`${this.oauthUrl}/token`);
+            
+            const response = await fetch(proxyUrl + targetUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
