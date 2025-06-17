@@ -4,11 +4,11 @@ class MemberSignup {
         this.currentFormData = null;
         this.memberDocumentId = null; // Stocker l'ID du document Firebase
         
-        // Configuration Square - Mode Sandbox
+        // Configuration Square - Mode Sandbox (vos credentials ForNap)
         this.squareConfig = {
-            applicationId: 'sandbox-sq0idb-YOUR_SANDBOX_APP_ID', // À remplacer par votre Application ID
-            locationId: 'YOUR_SANDBOX_LOCATION_ID', // À remplacer par votre Location ID
-            environment: 'sandbox' // 'sandbox' pour les tests, 'production' pour la production
+            applicationId: 'sandbox-sq0idb-emB5qLjloYgpPbdIpBWftw', // Votre Application ID
+            locationId: 'LK0RQAQMW1YA4', // Votre Location ID  
+            environment: 'sandbox' // Mode sandbox pour les tests
         };
         
         this.payments = null; // Instance Square Payments
@@ -1093,9 +1093,9 @@ class MemberSignup {
             // Sauvegarder les données temporairement
             this.currentFormData = memberData;
             
-            console.log('Initialisation du paiement HelloAsso...');
-            // Initialiser le paiement HelloAsso
-            await this.initializeHelloAssoPayment(memberData);
+            console.log('Initialisation du paiement Square...');
+            // Initialiser le paiement Square
+            await this.initializeSquarePayment(memberData);
 
         } catch (error) {
             console.error('ERREUR dans handleAdhesionSubmit:', error);
@@ -1223,7 +1223,7 @@ class MemberSignup {
         if (retryBtn) {
             retryBtn.onclick = () => {
                 document.querySelector('.alternative-payment').remove();
-                this.initializeHelloAssoPayment(formData);
+                this.initializeSquarePayment(formData);
             };
         }
         

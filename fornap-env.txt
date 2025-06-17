@@ -1,0 +1,14 @@
+# Configuration Square ForNap - Mode Sandbox - COMPLÈTE ✅
+SQUARE_ENVIRONMENT=sandbox
+SQUARE_ACCESS_TOKEN=EAAAlzuHgjzG7LGRCH4apGYT3sZRUJs9IpbPtbzbcR_QE2qtwxSJtElkVxDCSXTT
+SQUARE_APPLICATION_ID=sandbox-sq0idb-emB5qLjloYgpPbdIpBWftw
+SQUARE_LOCATION_ID=LK0RQAQMW1YA4
+SQUARE_MCC=7299
+
+# Configuration serveur
+PORT=3000
+
+# URLs autorisées (CORS)
+ALLOWED_ORIGINS=https://noagiannone03.github.io,http://localhost:3000,http://127.0.0.1:3000
+
+# ✅ Configuration complète ! Prêt pour les tests et la production 
